@@ -5,7 +5,7 @@ const path = require('path');
 //Creamos nuestra clase Empleado con sus respectivos parametros y metodos
 
 class Empleado {
-    constructor(trabajador_cedula, trabajador_nombre, trabajador_apellido, trabajador_celular, trabajador_correo, trabajador_latitud, trabajador_longitud, trabajador_direccion, trabajador_foto_base64, trabajador_doc_base64, trabajador_estado, trabajador_contrasenha) {
+    constructor(trabajador_cedula, trabajador_nombre, trabajador_apellido, trabajador_celular, trabajador_correo, trabajador_latitud, trabajador_longitud, trabajador_direccion, trabajador_foto_base64, trabajador_doc_base64, trabajador_estado, trabajador_contrasenha, servicios) {
         this.trabajador_cedula = parseInt(trabajador_cedula);
         this.trabajador_nombre = trabajador_nombre.toUpperCase();
         this.trabajador_apellido = trabajador_apellido.toUpperCase();
@@ -18,7 +18,10 @@ class Empleado {
         this.trabajador_doc_base64 = trabajador_doc_base64;
         this.trabajador_estado = trabajador_estado;
         this.trabajador_contrasenha = trabajador_contrasenha;
+        this.servicios = servicios;
     }
+    //getters
+    get_servicios = () => { return this.servicios; }
     get_trabajador_cedula = () => { return this.trabajador_cedula; }
     get_trabajador_nombre = () => { return this.trabajador_nombre; }
     get_trabajador_apellido = () => { return this.trabajador_apellido; }
@@ -66,5 +69,5 @@ class Empleado {
         }
     }
 }
-
+//exportamos el modulo
 exports.Empleado = Empleado;

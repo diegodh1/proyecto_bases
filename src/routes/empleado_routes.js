@@ -14,8 +14,9 @@ exports.crear_empleado = async (req, res) => {
     longitud = req.body.longitud;
     direccion = req.body.direccion;
     contrasenha = req.body.contrasenha;
+    servicios = req.body.servicios;
     empleado_controller = new Empleado_controller();
-    let data = empleado_controller.crear_empleado(cedula, nombre, apellido, celular, correo, latitud, longitud, direccion, cedula, cedula, true, contrasenha);
+    let data = empleado_controller.crear_empleado(cedula, nombre, apellido, celular, correo, latitud, longitud, direccion, cedula, cedula, true, contrasenha, servicios);
 
     if (!Number(cedula) || !Number(celular) || !Number(latitud) || !Number(longitud)) {
         res.json({
