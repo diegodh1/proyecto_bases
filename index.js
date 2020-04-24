@@ -3,10 +3,10 @@ var express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+var router = express.Router();
 
-// obtenemos los controladores
-let empleado = require('./src/controllers/empleado');
-let Empleado_controller = empleado.Empleado_controller;
+//obtenemos las rutas 
+const empleado_routes = require('./src/routes/empleado_routes');
 
 //inicializamos el servidor de express
 const app = express()
@@ -68,29 +68,7 @@ app.post('/upload_fotos', upload_fotos.single('foto'), (req, res, next) => {
 
 
 // este metodo me permite crear un empleado en la base de datos
-app.post('/crear_empleado', async (req, res) => {
-
-  //obtenemos los campos de la solicitud
-  cedula = req.body.cedula;
-  nombre = req.body.nombre;
-  apellido = req.body.apellido;
-  celular = req.body.celular;
-  correo = req.body.correo;
-  latitud = req.body.latitud;
-  longitud = req.body.longitud;
-  direccion = req.body.direccion;
-  contrasenha = req.body.contrasenha;
-  empleado_controller = new Empleado_controller();
-  let data = empleado_controller.crear_empleado(cedula, nombre, apellido, celular, correo, latitud, longitud, direccion, cedula, cedula, true, contrasenha);
-  
-  //resolvemos la promesa
-  data.then(result => {
-    res.json(result);
-  }).catch(err => {
-    res.send(err);
-  })
-
-});
+app.post('/crear_empleado', empleado_routes.crear_empleado);
 
 // corremos el servidor
 app.listen(port, function () {
