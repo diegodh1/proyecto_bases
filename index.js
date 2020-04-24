@@ -1,16 +1,21 @@
 // requerimos los paquetes de node
 var express = require('express');
+var cors = require('cors');
 const multer = require('multer');
-const cors = require('cors');
 const bodyParser = require('body-parser');
-var router = express.Router();
-
+const morgan = require('morgan');
+const _ = require('lodash');
 //obtenemos las rutas 
 const empleado_routes = require('./src/routes/empleado_routes');
 
 //inicializamos el servidor de express
 const app = express()
 const port = 3000;
+
+//agregamos otros middleware
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 
 // habilitamos subir archivos
@@ -38,10 +43,6 @@ let storage_fotos = multer.diskStorage({
 let upload_cedulas = multer({ storage: storage_cedulas });
 let upload_fotos = multer({ storage: storage_fotos });
 
-//agregamos otros middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // este metodo permite subir las cedulas al servidor
 app.post('/upload_cedula', upload_cedulas.single('documento'), (req, res, next) => {
@@ -69,6 +70,8 @@ app.post('/upload_fotos', upload_fotos.single('foto'), (req, res, next) => {
 
 // este metodo me permite crear un empleado en la base de datos
 app.post('/crear_empleado', empleado_routes.crear_empleado);
+// metodo para loguear el empleado a la apliacion
+app.post('/login_empleado', empleado_routes.login_empleado);
 
 // corremos el servidor
 app.listen(port, function () {

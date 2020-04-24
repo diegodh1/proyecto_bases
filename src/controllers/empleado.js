@@ -62,14 +62,14 @@ class Empleado_controller {
     // este metodo nos permite agregar los servicios que están asociados al empleado
     async agregar_servicios(trabajador_cedula, servicios) {
         //realizamos la consulta
-        const sql = 'INSERT INTO servicio(trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_estado) ' +
-            'VALUES($1, $2, $3, $4, $5) RETURNING trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor';
+        const sql = 'INSERT INTO servicio(trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_estado, servicio_descripcion) ' +
+            'VALUES($1, $2, $3, $4, $5, $6) RETURNING trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor';
         let list_servicios = [];
         //convertimos el strin a JSON
         let array_servicios = JSON.parse(servicios);
         //recorremos el array_servicios para agregar el servicio uno por uno
-        for(let i = 0; i<array_servicios.length; i++) {
-            const values = [trabajador_cedula, array_servicios[i].ocupacion_id, array_servicios[i].servicio_precio_hora, array_servicios[i].servicio_precio_unidad_labor, true];
+        for (let i = 0; i < array_servicios.length; i++) {
+            const values = [trabajador_cedula, array_servicios[i].ocupacion_id, array_servicios[i].servicio_precio_hora, array_servicios[i].servicio_precio_unidad_labor, true, array_servicios[i].servicio_descripcion];
             let data = pool
                 .connect()
                 .then(client => {
@@ -92,6 +92,54 @@ class Empleado_controller {
         }
         //eliminamos en caso de duplicados
         return [...new Set(list_servicios)];
+    }
+    async empleado_login(cedula, contrasenha) {
+        try {
+            empleado = new Empleado(cedula, '', '', 1, '', 1, 1, '', '', '', true, contrasenha, '');
+            //realizamos la consulta
+            const sql = 'SELECT trabajador_contrasenha FROM trabajador WHERE trabajador_cedula = $1';
+            const values = [cedula]
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            console.log(res.rows[0]);
+                            return res.rows[0];
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return [];
+                        })
+                });
+            //obetenmos la respuesta
+            let response = await data;
+            let contrasenha_decrypt = empleado.contrasenha_decrypt(response.trabajador_contrasenha)
+            if (contrasenha_decrypt !== contrasenha) {
+                return {
+                    status: 400,
+                    message: "Contraña incorrecta o usuario no registrado en la base de datos",
+                    cedula
+                };
+            }
+            else {
+                return {
+                    status: 200,
+                    message: "Ingreso realizado",
+                    cedula
+                };
+            }
+        }
+        catch (e) {
+            console.log(e);
+            return {
+                status: 500,
+                message: "Error interno del servidor",
+            };
+        }
     }
 }
 //exportamos el modulo
