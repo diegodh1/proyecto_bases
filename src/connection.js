@@ -1,8 +1,8 @@
 // requerimos pg el cual utilizaremos para conectarnos a nuestra base de datos
-const { Client } = require('pg');
+const { Pool }= require('pg');
 
 // creamos una nueva instancia para conectarnos a la base de datos
-const client = new Client({
+const pool = new Pool({
     host: '127.0.0.1',
     port: 5432,
     user: 'postgres',
@@ -10,11 +10,4 @@ const client = new Client({
     database: 'mande'
 })
 
-// nos conectamos a la base de datos
-client
-    .connect()
-    .then(() => console.log('connected'))
-    .catch(err => console.error('connection error', err.stack))
-
-//exportamos el modulo
-exports.client = client;
+exports.pool = pool;
