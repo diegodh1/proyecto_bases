@@ -7,7 +7,7 @@ class Usuario_controller {
     constructor() {
 
         }
-        //METODO QUE PERMITE CREAR UN Usuario NUEVO EN LA BASE DE DATOS
+        //METODO QUE PERMITE CREAR UN Usuario NUEVO EN LA BASE DE DATOS 
     async crear_usuario(id, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, recibo_base64, contrasenha, estado_usuario) {
             try {
                 //creamos el usuario
