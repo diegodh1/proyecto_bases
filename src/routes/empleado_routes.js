@@ -4,7 +4,6 @@ let Empleado_controller = empleado.Empleado_controller;
 
 // metodo para poder crear un empleado en la base de datos
 exports.crear_empleado = async (req, res) => {
-
     //obtenemos los campos de la solicitud
     cedula = req.body.cedula;
     nombre = req.body.nombre;
@@ -40,7 +39,6 @@ exports.crear_empleado = async (req, res) => {
 
 // metodo para poder loguearnos como empleados a la base de datos
 exports.login_empleado = async (req, res) => {
-
     //obtenemos los campos de la solicitud
     cedula = req.body.cedula;
     contrasenha = req.body.contrasenha;
@@ -49,7 +47,7 @@ exports.login_empleado = async (req, res) => {
 
     if (!Number(cedula) || contrasenha === '') {
         res.json({
-            message: 'La cédula debe ser tipo nnmérico y la contraseña no puede ser vacia',
+            message: 'La cédula debe ser tipo numérico y la contraseña no puede ser vacía',
             status: 400
         });
     }

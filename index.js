@@ -5,6 +5,7 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const _ = require('lodash');
+
 //obtenemos las rutas 
 const empleado_routes = require('./src/routes/empleado_routes');
 const usuario_routes = require('./src/routes/usuario_routes');
@@ -23,14 +24,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // storage de las cedulas
 let storage_cedulas = multer.diskStorage({
-        destination: function(req, file, cb) {
-            cb(null, 'uploads/cedulas')
-        },
-        filename: function(req, file, cb) {
-            cb(null, req.body.cedula)
-        }
-    })
-    // storage de las fotos
+    destination: function(req, file, cb) {
+        cb(null, 'uploads/cedulas')
+    },
+    filename: function(req, file, cb) {
+        cb(null, req.body.cedula)
+    }
+})
+
+// storage de las fotos
 let storage_fotos = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, 'uploads/fotos')
@@ -55,41 +57,44 @@ let upload_cedulas = multer({ storage: storage_cedulas });
 let upload_fotos = multer({ storage: storage_fotos });
 let upload_recibos = multer({ storage: storage_recibos })
 
-
 // este metodo permite subir las cedulas al servidor
 app.post('/upload_cedula', upload_cedulas.single('documento'), (req, res, next) => {
     const file = req.file
     if (!file) {
         const error = new Error('Please upload a file')
         error.httpStatusCode = 400
+
         return next(error)
     }
-    res.send(file)
 
+    res.send(file)
 });
+
 // este metodo permite de subir las fotos de la persona al servidor
 app.post('/upload_fotos', upload_fotos.single('foto'), (req, res, next) => {
     const file = req.file
     if (!file) {
         const error = new Error('Please upload a file')
         error.httpStatusCode = 400
+
         return next(error)
     }
-    res.send(file)
 
+    res.send(file)
 });
+
 // este metodo permite de subir los recibos de la persona al servidor
 app.post('/upload_recibos', upload_recibos.single('recibo'), (req, res, next) => {
     const file = req.file
     if (!file) {
         const error = new Error('Please upload a file')
         error.httpStatusCode = 400
+
         return next(error)
 
     }
     res.send(file)
 });
-
 
 // este metodo me permite crear un empleado en la base de datos
 app.post('/crear_empleado', empleado_routes.crear_empleado);

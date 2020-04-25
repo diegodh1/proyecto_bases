@@ -4,7 +4,6 @@ let Usuario_controller = usuario.Usuario_controller;
 
 // metodo para poder crear un usuario en la base de datos
 exports.crear_usuario = async(req, res) => {
-
     //obtenemos los campos de la solicitud
     id = req.body.id;
     nombre = req.body.nombre;
@@ -38,7 +37,6 @@ exports.crear_usuario = async(req, res) => {
 
 // metodo para poder loguearnos como usuarios a la base de datos
 exports.login_usuario = async(req, res) => {
-
     //obtenemos los campos de la solicitud
     id = req.body.id;
     contrasenha = req.body.contrasenha;

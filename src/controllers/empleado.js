@@ -4,9 +4,7 @@ const { pool } = require('../connection');
 
 //CREAMOS LA CLASE CONTROLADORA DE EMPLEADO LA CUAL ES LA QUE VA A COMUNICARSE DIRECTAMENTE CON LA BASE DE DATOS
 class Empleado_controller {
-    constructor() {
-
-    }
+    constructor() {}
     //METODO QUE PERMITE CREAR UN EMPLEADO NUEVO EN LA BASE DE DATOS
     async crear_empleado(cedula, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, doc_base64, estado_trabajador, contrasenha, servicios) {
         try {
@@ -142,5 +140,6 @@ class Empleado_controller {
         }
     }
 }
+
 //exportamos el modulo
 exports.Empleado_controller = Empleado_controller;

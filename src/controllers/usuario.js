@@ -29,7 +29,7 @@ class Usuario_controller {
                         usuario.contrasenha_ecrypt(),
                         usuario.get_usuario_estado()
                     ]
-                    // realizamos la consulta
+                // realizamos la consulta
                 let data = pool
                     .connect()
                     .then(client => {
@@ -57,7 +57,7 @@ class Usuario_controller {
                 return { info_usuario: { cedula: '', nombre: '', apellido: '' }, status: 500, message: 'error interno del servidor' };
             }
         }
-        // este metodo nos permite loguear al usuario
+    // este metodo nos permite loguear al usuario
     async usuario_login(id, contrasenha) {
         try {
             usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', contrasenha, true);
@@ -105,5 +105,6 @@ class Usuario_controller {
         }
     }
 }
+
 //exportamos el modulo
 exports.Usuario_controller = Usuario_controller;
