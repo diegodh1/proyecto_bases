@@ -93,12 +93,12 @@ app.post('/upload_recibos', upload_recibos.single('recibo'), (req, res, next) =>
         return next(error)
 
     }
-    
+
     res.send(file)
 });
 
 // este metodo permite restablecer la contraseña de un empleado en la base de datos
-app.post('/restablecer_contraseña', empleado_routes.restablecer_contrasenha);
+app.post('/restablecer_contrasenha', empleado_routes.restablecer_contrasenha);
 // este metodo me permite crear un empleado en la base de datos
 app.post('/crear_empleado', empleado_routes.crear_empleado);
 // metodo para loguear el empleado a la apliacion
