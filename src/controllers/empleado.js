@@ -27,6 +27,7 @@ class Empleado_controller {
             empleado.doc_to_base64(),
             empleado.get_trabajador_estado(),
             empleado.contrasenha_ecrypt()]
+
             // realizamos la consulta
             let data = pool
                 .connect()
@@ -162,12 +163,14 @@ class Empleado_controller {
         }
     }
 
-    async restablecer_contraseña(cedula, contrasenha) {
+    async restablecer_contrasenha(cedula, contrasenha) {
         try {
             empleado = new Empleado(cedula, '', '', 1, '', 1, 1, '', '', '', true, contrasenha, '');
+
             //realizamos la consulta
-            const sql = 'UPDATE trabajador SET trabajador_contrasenha = $1 WHERE trabajador_cedula = $1';
-            const values = [empleado.get_trabajador_cedula]
+            const sql = 'UPDATE trabajador SET trabajador_contrasenha = $1 WHERE trabajador_cedula = $2';
+            const values = [empleado.contrasenha_ecrypt(), cedula]
+
             let data = pool
                 .connect()
                 .then(client => {
@@ -175,17 +178,16 @@ class Empleado_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            console.log(res.rows[0]);
+
                             return {
-                                info_empleado: res.rows[0],
                                 status: 200,
                                 message: 'contraseña restablecida con éxito'
                             };
                         })
                         .catch(err => {
                             client.release();
+
                             return {
-                                info_empleado: res.rows[0],
                                 status: 500,
                                 message: 'Error interno del servidor'
                             };
@@ -197,6 +199,8 @@ class Empleado_controller {
             if (response.status !== 200) {
                 return response;
             }
+
+            return response;
         }
         catch (e) {
             return {

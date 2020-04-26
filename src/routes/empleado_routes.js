@@ -25,7 +25,7 @@ exports.crear_empleado = async (req, res) => {
             status: 400
         });
     }
-    
+
     //resolvemos la promesa
     data.then(result => {
         res.json(result);
@@ -68,10 +68,17 @@ exports.restablecer_contrasenha = async (req, res) => {
     cedula = req.body.cedula;
     contrasenha = req.body.contrasenha;
 
-    if (!Number(cedula) || length(cedula) === 0) {
+    if (cedula.toString().length === 0) {
         res.json({
             status: 400,
-            message: 'La cédula debe ser tipo numérico'
+            message: 'Cedula no puede ser vacía'
+        });
+    }
+
+    if (!Number(cedula)) {
+        res.json({
+            status: 400,
+            message: 'Cédula debe ser tipo numérico'
         });
     }
 
@@ -86,6 +93,7 @@ exports.restablecer_contrasenha = async (req, res) => {
     const data = empleado_controller.restablecer_contrasenha(cedula, contrasenha);
 
     data.then(result => {
+        console.log(result)
         res.json(result);
     }).catch(err => {
         res.json({
