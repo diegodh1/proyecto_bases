@@ -24,30 +24,30 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // storage de las cedulas
 let storage_cedulas = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'uploads/cedulas')
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, req.body.cedula)
     }
 })
 
 // storage de las fotos
 let storage_fotos = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'uploads/fotos')
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, req.body.cedula)
     }
 })
 
 // storage de los recibos
 let storage_recibos = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'uploads/recibos')
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, req.body.cedula)
     }
 })
@@ -93,9 +93,12 @@ app.post('/upload_recibos', upload_recibos.single('recibo'), (req, res, next) =>
         return next(error)
 
     }
+    
     res.send(file)
 });
 
+// este metodo permite restablecer la contraseña de un empleado en la base de datos
+app.post('/restablecer_contraseña', empleado_routes.restablecer_contrasenha);
 // este metodo me permite crear un empleado en la base de datos
 app.post('/crear_empleado', empleado_routes.crear_empleado);
 // metodo para loguear el empleado a la apliacion
@@ -106,6 +109,6 @@ app.post('/login_usuario', usuario_routes.login_usuario);
 app.post('/crear_usuario', usuario_routes.crear_usuario);
 
 // corremos el servidor
-app.listen(port, function() {
+app.listen(port, function () {
     console.log('CORS-enabled web server listening on port 3000')
 })

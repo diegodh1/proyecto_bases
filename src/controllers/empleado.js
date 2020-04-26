@@ -4,7 +4,8 @@ const { pool } = require('../connection');
 
 //CREAMOS LA CLASE CONTROLADORA DE EMPLEADO LA CUAL ES LA QUE VA A COMUNICARSE DIRECTAMENTE CON LA BASE DE DATOS
 class Empleado_controller {
-    constructor() {}
+    constructor() { }
+
     //METODO QUE PERMITE CREAR UN EMPLEADO NUEVO EN LA BASE DE DATOS
     async crear_empleado(cedula, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, doc_base64, estado_trabajador, contrasenha, servicios) {
         try {
@@ -35,28 +36,45 @@ class Empleado_controller {
                         .then(res => {
                             client.release();
                             console.log(res.rows[0]);
-                            return { info_empleado: res.rows[0], status: 200, message: 'Empleado creado con éxito', servicios: [] };
 
+                            return {
+                                info_empleado: res.rows[0],
+                                status: 200,
+                                message: 'Empleado creado con éxito',
+                                servicios: []
+                            };
                         })
                         .catch(err => {
                             client.release();
-                            return { info_empleado: { cedula: '', nombre: '', apellido: '' }, status: 400, message: err.detail, servicios: [] };
+
+                            return {
+                                info_empleado: {
+                                    cedula: '',
+                                    nombre: '',
+                                    apellido: ''
+                                },
+                                status: 400,
+                                message: err.detail,
+                                servicios: []
+                            };
                         })
                 });
+
             // resolvemos la promesa
             let response = await data;
             if (response.status !== 200) {
                 return response;
             }
-            else {
-                response.servicios = await this.agregar_servicios(empleado.get_trabajador_cedula(), empleado.get_servicios());
-                return response;
-            }
+
+            response.servicios = await this.agregar_servicios(empleado.get_trabajador_cedula(), empleado.get_servicios());
+
+            return response;
         }
         catch (e) {
             return { info_empleado: { cedula: '', nombre: '', apellido: '' }, status: 500, message: 'error interno del servidor' };
         }
     }
+
     // este metodo nos permite agregar los servicios que están asociados al empleado
     async agregar_servicios(trabajador_cedula, servicios) {
         //realizamos la consulta
@@ -84,19 +102,22 @@ class Empleado_controller {
                             return [];
                         })
                 });
+
             //obetenmos la respuesta
             let response = await data;
             list_servicios.push(response);
         }
+
         //eliminamos en caso de duplicados
         return [...new Set(list_servicios)];
     }
+
     async empleado_login(cedula, contrasenha) {
         try {
             empleado = new Empleado(cedula, '', '', 1, '', 1, 1, '', '', '', true, contrasenha, '');
             //realizamos la consulta
-            const sql = 'SELECT trabajador_contrasenha FROM trabajador WHERE trabajador_cedula = $1';
-            const values = [cedula]
+            const sql = 'SELECT trabajador_contrasenha FROM trabajador WHERE trabajador_cedula = $2';
+            const values = [cedula, empleado.contrasenha_ecrypt()]
             let data = pool
                 .connect()
                 .then(client => {
@@ -105,14 +126,16 @@ class Empleado_controller {
                         .then(res => {
                             client.release();
                             console.log(res.rows[0]);
-                            return res.rows[0];
 
+                            return res.rows[0];
                         })
                         .catch(err => {
                             client.release();
+
                             return [];
                         })
                 });
+
             //obetenmos la respuesta
             let response = await data;
             let contrasenha_decrypt = empleado.contrasenha_decrypt(response.trabajador_contrasenha)
@@ -123,13 +146,12 @@ class Empleado_controller {
                     cedula
                 };
             }
-            else {
-                return {
-                    status: 200,
-                    message: "Ingreso realizado",
-                    cedula
-                };
-            }
+
+            return {
+                status: 200,
+                message: "Ingreso realizado",
+                cedula
+            };
         }
         catch (e) {
             console.log(e);
@@ -137,6 +159,50 @@ class Empleado_controller {
                 status: 500,
                 message: "Error interno del servidor",
             };
+        }
+    }
+
+    async restablecer_contraseña(cedula, contrasenha) {
+        try {
+            empleado = new Empleado(cedula, '', '', 1, '', 1, 1, '', '', '', true, contrasenha, '');
+            //realizamos la consulta
+            const sql = 'UPDATE trabajador SET trabajador_contrasenha = $1 WHERE trabajador_cedula = $1';
+            const values = [empleado.get_trabajador_cedula]
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            console.log(res.rows[0]);
+                            return {
+                                info_empleado: res.rows[0],
+                                status: 200,
+                                message: 'contraseña restablecida con éxito'
+                            };
+                        })
+                        .catch(err => {
+                            client.release();
+                            return {
+                                info_empleado: res.rows[0],
+                                status: 500,
+                                message: 'Error interno del servidor'
+                            };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            }
+        }
+        catch (e) {
+            return {
+                status: 500,
+                message: "Error interno del servidor"
+            }
         }
     }
 }
