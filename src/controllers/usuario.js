@@ -104,6 +104,54 @@ class Usuario_controller {
             };
         }
     }
+
+    //METODO QUE PERMITE PEDIR un servicio en la base
+    async servicio_pedir(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id) {
+        try {
+            //creamos el usuario
+            usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', 1, true);
+            //realizamos la consulta
+            const sql = 'INSERT INTO servicio_pedido(servicio_nro, servicio_pedido_fecha, servicio_pedido_descripcion, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora, usuario_id, estado_servicio_id)' +
+                'VALUES($1, $2, $3, $4, $5, $6, $7, $8)';
+            //obtenemos los valores para asignar
+            const values = [parseInt(servicio_nro),
+                    servicio_pedido_fecha,
+                    descripcion,
+                    parseFloat(servicio_horas),
+                    parseFloat(servicio_unidad_labor),
+                    es_por_hora,
+                    usuario.get_usuario_id(),
+                    estado_servicio_id
+                ]
+                // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            console.log(res.rows[1]);
+                            return { pedido_id: res.rows[1], status: 200, message: 'Servicio pedido con exito' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 400, message: err.detail };
+                        })
+                });
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            } else {
+                return response;
+            }
+        } catch (e) {
+            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'error interno del servidor' };
+        }
+    }
+
 }
 //exportamos el modulo
 exports.Usuario_controller = Usuario_controller;
