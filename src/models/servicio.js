@@ -1,7 +1,6 @@
 //Creamos nuestra clase Servicio con sus respectivos parametros y metodos
 class Servicio {
-    constructor(servicio_nro, trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, servicio_estado) {
-        this.servicio_nro = parseInt(servicio_nro);
+    constructor(trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, servicio_estado) {
         this.trabajador_cedula = parseInt(trabajador_cedula);
         this.ocupacion = ocupacion_id;
         this.servicio_precio_hora = parseFloat(servicio_precio_hora);
@@ -11,7 +10,6 @@ class Servicio {
     }
 
     //getters
-    get_servicio_nro = () => { return this.servicio_nro; }
     get_trabajador_cedula = () => { return this.trabajador_cedula; }
     get_ocupacion = () => { return this.ocupacion; }
     get_servicio_precio_hora = () => { return this.servicio_precio_hora; }

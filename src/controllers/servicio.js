@@ -7,15 +7,14 @@ class Servicio_controller {
     constructor() { }
 
     //METODO QUE PERMITE CREAR UN Servicio NUEVO EN LA BASE DE DATOS
-    async crear_servicio(servicio_nro, trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, servicio_estado) {
+    async crear_servicio(trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, servicio_estado) {
         try {
-            servicio = new Servicio(servicio_nro, trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, servicio_estado);
+            servicio = new Servicio(trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, servicio_estado);
 
-            const sql = 'INSERT INTO servicio(servicio_nro, trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, servicio_estado) ' +
-                'VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING servicio_nro, trabajador_cedula, ocupacion_id, servicio_descripcion';
+            const sql = 'INSERT INTO servicio(trabajador_cedula, ocupacion_id, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, servicio_estado) ' +
+                'VALUES($1, $2, $3, $4, $5, $6) RETURNING servicio_nro, trabajador_cedula, ocupacion_id, servicio_descripcion';
 
             const values = [
-                servicio.get_servicio_nro(),
                 servicio.get_trabajador_cedula(),
                 servicio.get_ocupacion(),
                 servicio.get_servicio_precio_hora(),
