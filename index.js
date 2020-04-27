@@ -10,7 +10,7 @@ const empleado_routes = require('./src/routes/empleado_routes');
 
 //inicializamos el servidor de express
 const app = express()
-const port = 3000;
+const port = 4000;
 
 //agregamos otros middleware
 app.use(cors());
@@ -75,5 +75,5 @@ app.post('/login_empleado', empleado_routes.login_empleado);
 
 // corremos el servidor
 app.listen(port, function () {
-  console.log('CORS-enabled web server listening on port 3000')
+  console.log('CORS-enabled web server listening on port 4000')
 })

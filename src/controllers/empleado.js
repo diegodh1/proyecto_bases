@@ -122,7 +122,7 @@ class Empleado_controller {
                 return {
                     status: 400,
                     message: "Contraña incorrecta o usuario no registrado en la base de datos",
-                    cedula
+                    cedula: 0
                 };
             }
             else {
@@ -138,6 +138,7 @@ class Empleado_controller {
             return {
                 status: 500,
                 message: "Error interno del servidor",
+                cedula: 0
             };
         }
     }
