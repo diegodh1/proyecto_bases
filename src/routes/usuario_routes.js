@@ -35,6 +35,41 @@ exports.crear_usuario = async(req, res) => {
     }
 };
 
+//metodo para poder pedir un servicio en la base de datos
+exports.pedir_servicio = async(req, res) => {
+
+    //obtenemos los campos de la solicitud
+    usuario_id = req.body.usuario_id;
+    servicio_nro = req.body.servicio_nro;
+    estado_servicio_id = req.body.estado_servicio_id;
+    servicio_pedido_fecha = req.body.servicio_pedido_fecha;
+    descripcion = req.body.descripcion;
+    servicio_horas = req.body.servicio_horas;
+    servicio_unidad_labor = req.body.servicio_unidad_labor;
+    es_por_hora = req.body.es_por_hora;
+
+    usuario_controller = new Usuario_controller();
+    let data = usuario_controller.servicio_verificar_estado(servicio_nro, servicio_pedido_fecha, descripcion,
+        servicio_horas, servicio_unidad_labor, es_por_hora, usuario_id, estado_servicio_id);
+
+    if (!Number(servicio_horas) || !Number(servicio_unidad_labor)) {
+        res.json({
+            message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+};
+
 // metodo para poder loguearnos como usuarios a la base de datos
 exports.login_usuario = async(req, res) => {
     //obtenemos los campos de la solicitud
