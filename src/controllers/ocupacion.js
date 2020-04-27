@@ -12,7 +12,7 @@ class Ocupacion_controller {
         try {
             ocupacion = new Ocupacion(id);
             //realizamos la consulta
-            const sql = 'SELECT ocupacion_id FROM ocupacion WHERE ocupacion_id LIKE $1';
+            const sql = 'SELECT ocupacion_id FROM ocupacion WHERE ocupacion_id LIKE $1 LIMIT 10';
             const values = ['%' + ocupacion.get_ocupacion_id() + '%']
             let data = pool
                 .connect()
