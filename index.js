@@ -110,9 +110,5 @@ app.post('/crear_usuario', usuario_routes.crear_usuario);
 
 // corremos el servidor
 app.listen(port, function () {
-<<<<<<< HEAD
-  console.log('CORS-enabled web server listening on port 4000')
-=======
-    console.log('CORS-enabled web server listening on port 3000')
->>>>>>> 1ad2a30fcb7892699307ed218165c0379ff1b9f9
+  console.log('CORS-enabled web server listening on port 4000');
 })
