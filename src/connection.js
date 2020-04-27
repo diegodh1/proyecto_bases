@@ -1,5 +1,5 @@
 // requerimos pg el cual utilizaremos para conectarnos a nuestra base de datos
-const { Pool }= require('pg');
+const { Pool } = require('pg');
 
 // creamos una nueva instancia para conectarnos a la base de datos
 const pool = new Pool({

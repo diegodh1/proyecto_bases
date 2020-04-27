@@ -2,8 +2,8 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-//Creamos nuestra clase Empleado con sus respectivos parametros y metodos
 
+//Creamos nuestra clase Empleado con sus respectivos parametros y metodos
 class Empleado {
     constructor(trabajador_cedula, trabajador_nombre, trabajador_apellido, trabajador_celular, trabajador_correo, trabajador_latitud, trabajador_longitud, trabajador_direccion, trabajador_foto_base64, trabajador_doc_base64, trabajador_estado, trabajador_contrasenha, servicios) {
         this.trabajador_cedula = parseInt(trabajador_cedula);
@@ -20,6 +20,7 @@ class Empleado {
         this.trabajador_contrasenha = trabajador_contrasenha;
         this.servicios = servicios;
     }
+
     //getters
     get_servicios = () => { return this.servicios; }
     get_trabajador_cedula = () => { return this.trabajador_cedula; }
@@ -32,6 +33,7 @@ class Empleado {
     get_trabajador_direccion = () => { return this.trabajador_direccion; }
     get_trabajador_estado = () => { return this.trabajador_estado; }
     get_trabajador_contrasenha = () => { return this.trabajador_contrasenha; }
+
     // permite encriptar una contraseña
     contrasenha_ecrypt() {
         let mykey = crypto.createCipher('aes-128-cbc', 'mypassword');
@@ -39,6 +41,7 @@ class Empleado {
         mystr += mykey.final('hex');
         return mystr;
     }
+
     // permite desencriptar una contraseña
     contrasenha_decrypt(password) {
         let mykey = crypto.createDecipher('aes-128-cbc', 'mypassword');
@@ -46,6 +49,7 @@ class Empleado {
         mystr += mykey.final('utf8');
         return mystr;
     }
+
     // permite leer una foto y convertirlo en base64
     foto_to_base64() {
         try {
@@ -57,6 +61,7 @@ class Empleado {
             return "";
         }
     }
+
     // permite leer una cedula y convertirla en base64
     doc_to_base64() {
         try {
@@ -69,5 +74,6 @@ class Empleado {
         }
     }
 }
+
 //exportamos el modulo
 exports.Empleado = Empleado;
