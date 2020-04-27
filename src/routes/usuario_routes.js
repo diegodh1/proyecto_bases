@@ -50,7 +50,7 @@ exports.pedir_servicio = async(req, res) => {
     es_por_hora = req.body.es_por_hora;
 
     usuario_controller = new Usuario_controller();
-    let data = usuario_controller.servicio_pedir(servicio_nro, servicio_pedido_fecha, descripcion,
+    let data = usuario_controller.servicio_verificar_estado(servicio_nro, servicio_pedido_fecha, descripcion,
         servicio_horas, servicio_unidad_labor, es_por_hora, usuario_id, estado_servicio_id);
 
     if (!Number(servicio_horas) || !Number(servicio_unidad_labor)) {
