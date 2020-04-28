@@ -9,10 +9,11 @@ const _ = require('lodash');
 //obtenemos las rutas 
 const empleado_routes = require('./src/routes/empleado_routes');
 const usuario_routes = require('./src/routes/usuario_routes');
+const ocupacion_routes = require('./src/routes/ocupacion_routes');
 
 //inicializamos el servidor de express
 const app = express()
-const port = 3000;
+const port = 4000;
 
 //agregamos otros middleware
 app.use(cors());
@@ -103,12 +104,20 @@ app.post('/restablecer_contrasenha', empleado_routes.restablecer_contrasenha);
 app.post('/crear_empleado', empleado_routes.crear_empleado);
 // metodo para loguear el empleado a la apliacion
 app.post('/login_empleado', empleado_routes.login_empleado);
+// este metodo me permite agregar servicios a un trabajador
+app.post('/agregar_servicios_empleado', empleado_routes.agregar_servicios_empleado);
 // metodo para loguear el usuario a la apliacion
 app.post('/login_usuario', usuario_routes.login_usuario);
 // este metodo me permite crear un usuario en la base de datos
 app.post('/crear_usuario', usuario_routes.crear_usuario);
+//// este metodo nos permite crear el pedido de un servicio
+app.post('/pedir_servicio', usuario_routes.pedir_servicio);
+// este metodo me permite filtrar la lista de ocupacion
+app.post('/filtro_ocupacion', ocupacion_routes.filtro_ocupacion);
+
+
 
 // corremos el servidor
 app.listen(port, function () {
-    console.log('CORS-enabled web server listening on port 3000')
+  console.log('CORS-enabled web server listening on port 4000');
 })

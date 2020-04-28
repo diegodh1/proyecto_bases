@@ -103,6 +103,198 @@ class Usuario_controller {
             };
         }
     }
+
+    //METODO QUE PERMITE PEDIR un servicio en la base
+    async servicio_pedir(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id) {
+        try {
+            //creamos el usuario
+            usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', 1, true);
+            //realizamos la consulta
+            const sql = 'INSERT INTO servicio_pedido(servicio_nro, servicio_pedido_fecha, servicio_pedido_descripcion, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora, usuario_id, estado_servicio_id)' +
+                'VALUES($1, $2, $3, $4, $5, $6, $7, $8)';
+            //obtenemos los valores para asignar
+            const values = [parseInt(servicio_nro),
+                servicio_pedido_fecha,
+                descripcion,
+            parseFloat(servicio_horas),
+            parseFloat(servicio_unidad_labor),
+                es_por_hora,
+            usuario.get_usuario_id(),
+                estado_servicio_id
+            ]
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { pedido_id: res.rows[1], status: 200, message: 'Servicio pedido con exito' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 400, message: err.detail };
+                        })
+                });
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            } else {
+                return response;
+            }
+        } catch (e) {
+            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'error interno del servidor' };
+        }
+    }
+
+    //METODO QUE PERMITE VERIFICAR un servicio en la base respecto a su estado y ocupacion solicitada
+    async servicio_verificar_estado(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id) {
+        try {
+            //creamos el usuario
+            usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', 1, true);
+            //realizamos la consulta
+            const sql = "SELECT ocupacion_id FROM servicio NATURAL JOIN " +
+                "(SELECT servicio_nro FROM servicio_pedido WHERE " +
+                "(estado_servicio_id = 'PENDIENTE' OR estado_servicio_id = 'ACEPTADO' OR estado_servicio_id = 'OCUPADO') AND usuario_id = $1) AS procesados";
+            //obtenemos los valores para asignar
+            const values = [usuario.get_usuario_id()]
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return res.rows;
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return [];
+                        })
+                });
+            // resolvemos la promesa
+            let response = await data;
+            if (response.length > 0) {
+                let ocupacion_actual = await this.dar_ocupacion_servicio(servicio_nro);
+                for (let i = 0; i < response.length; i++) {
+
+                    if (ocupacion_actual === response[i].ocupacion_id) {
+                        return { ocupacion_id: '', status: 400, message: 'No se puede solicitar otro pedido de la misma ocupacion mientras este en proceso' }
+                    }
+
+                }
+                return this.servicio_verificar_fecha(servicio_nro, servicio_pedido_fecha,
+                    descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id);
+            } else {
+                return this.servicio_verificar_fecha(servicio_nro, servicio_pedido_fecha,
+                    descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id);
+            }
+        } catch (e) {
+            return { ocupacion_id: '', status: 500, message: 'error interno del servidor' };
+        }
+    }
+
+    //METODO QUE PERMITE VERIFICAR un servicio en la base respecto a su fecha solicitada
+    async servicio_verificar_fecha(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id) {
+        try {
+            //realizamos la consulta
+            const sql = "SELECT servicio_pedido_id FROM " +
+                "(SELECT servicio_pedido_id, servicio_pedido_fecha, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE " +
+                "(estado_servicio_id = 'PENDIENTE' OR estado_servicio_id = 'ACEPTADO' OR estado_servicio_id = 'OCUPADO') AND usuario_id = $1) AS procesados " +
+                "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4 AND $5 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
+                "(servicio_pedido_es_por_hora = true AND $6 AND (servicio_pedido_fecha - $7 * INTERVAL '1 hour' < $8 AND $9 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
+                "(servicio_pedido_es_por_hora = false AND $10 AND ( servicio_pedido_fecha - INTERVAL '3 hour' < $11 AND $12 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
+                "(servicio_pedido_es_por_hora = true AND $13 AND (servicio_pedido_fecha - INTERVAL '3 hour' < $14 AND $15 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
+            //obtenemos los valores para asignar
+
+            const values = [usuario.get_usuario_id(),
+            es_por_hora == 'true',
+            "" + servicio_horas,
+                servicio_pedido_fecha,
+                servicio_pedido_fecha,
+            es_por_hora == 'true',
+            "" + servicio_horas,
+                servicio_pedido_fecha,
+                servicio_pedido_fecha,
+            es_por_hora == 'false',
+                servicio_pedido_fecha,
+                servicio_pedido_fecha,
+            es_por_hora == 'false',
+                servicio_pedido_fecha,
+                servicio_pedido_fecha
+            ]
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return res.rows;
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return [];
+                        })
+                });
+            // resolvemos la promesa
+
+            let response = await data;
+            if (response.length > 0) {
+
+                return { ocupacion_id: '', status: 400, message: 'No se puede solicitar otro pedido en horario de otro ya solicitado' };
+            } else {
+                return this.servicio_pedir(servicio_nro, servicio_pedido_fecha,
+                    descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id);
+            }
+        } catch (e) {
+            return { ocupacion_id: '', status: 500, message: 'error interno del servidor' };
+        }
+    }
+
+    //METODO QUE retorna la ocupacion_id de un servicio
+    async dar_ocupacion_servicio(servicio_nro) {
+        try {
+
+            //realizamos la consulta
+            const sql = 'SELECT ocupacion_id FROM servicio WHERE servicio_nro = $1';
+            //obtenemos los valores para asignar
+            const values = [parseInt(servicio_nro)]
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return res.rows[0].ocupacion_id;
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return 'NO ENCONTRADO';
+                        })
+                });
+            // resolvemos la promesa
+            let response = await data;
+            if (response === 'NO ENCONTRADO') {
+                return 'NO ENCONTRADO';
+            } else {
+                return response;
+            }
+        } catch (e) {
+            return { ocupacion_id: '', status: 500, message: 'error interno del servidor' };
+        }
+    }
+
 }
 
 //exportamos el modulo

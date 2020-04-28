@@ -3,7 +3,7 @@ let empleado = require('../controllers/empleado');
 let Empleado_controller = empleado.Empleado_controller;
 
 // metodo para poder crear un empleado en la base de datos
-exports.crear_empleado = async (req, res) => {
+exports.crear_empleado = async(req, res) => {
     //obtenemos los campos de la solicitud
     cedula = req.body.cedula;
     nombre = req.body.nombre;
@@ -36,6 +36,36 @@ exports.crear_empleado = async (req, res) => {
         });
     });
 };
+
+// metodo para poder agregar servicios a un empleado
+exports.agregar_servicios_empleado = async(req, res) => {
+
+    //obtenemos los campos de la solicitud
+    cedula = req.body.cedula;
+    servicios = req.body.servicios;
+
+    empleado_controller = new Empleado_controller();
+    let data = empleado_controller.verificar_servicios(cedula, servicios);
+
+    if (!Number(cedula)) {
+        res.json({
+            message: 'La cédula debe ser un dato númerico',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+
+
+}
 
 // metodo para poder loguearnos como empleados a la base de datos
 exports.login_empleado = async (req, res) => {

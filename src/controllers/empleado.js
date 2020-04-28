@@ -117,8 +117,9 @@ class Empleado_controller {
         try {
             empleado = new Empleado(cedula, '', '', 1, '', 1, 1, '', '', '', true, contrasenha, '');
             //realizamos la consulta
-            const sql = 'SELECT trabajador_contrasenha FROM trabajador WHERE trabajador_cedula = $2';
-            const values = [cedula, empleado.contrasenha_ecrypt()]
+            const sql = 'SELECT trabajador_contrasenha FROM trabajador WHERE trabajador_cedula = $1';
+            const values = [empleado.get_trabajador_cedula()]
+            console.log(empleado.get_trabajador_cedula());
             let data = pool
                 .connect()
                 .then(client => {
@@ -127,24 +128,29 @@ class Empleado_controller {
                         .then(res => {
                             client.release();
                             console.log(res.rows[0]);
-
                             return res.rows[0];
                         })
                         .catch(err => {
                             client.release();
-
-                            return [];
                         })
                 });
 
             //obetenmos la respuesta
             let response = await data;
-            let contrasenha_decrypt = empleado.contrasenha_decrypt(response.trabajador_contrasenha)
+            if(response == undefined){
+                return {
+                    status: 400,
+                    message: "Contraña incorrecta o usuario no registrado en la base de datos",
+                    cedula: 0
+                };
+            }
+            let contrasenha_decrypt = empleado.contrasenha_decrypt(response.trabajador_contrasenha);
+            console.log(contrasenha_decrypt);
             if (contrasenha_decrypt !== contrasenha) {
                 return {
                     status: 400,
                     message: "Contraña incorrecta o usuario no registrado en la base de datos",
-                    cedula
+                    cedula: 0
                 };
             }
 
@@ -159,6 +165,7 @@ class Empleado_controller {
             return {
                 status: 500,
                 message: "Error interno del servidor",
+                cedula: 0
             };
         }
     }
