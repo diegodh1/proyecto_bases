@@ -3,12 +3,7 @@ let empleado = require('../controllers/empleado');
 let Empleado_controller = empleado.Empleado_controller;
 
 // metodo para poder crear un empleado en la base de datos
-<<<<<<< HEAD
-exports.crear_empleado = async (req, res) => {
-=======
 exports.crear_empleado = async(req, res) => {
-
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
     //obtenemos los campos de la solicitud
     cedula = req.body.cedula;
     nombre = req.body.nombre;
@@ -29,7 +24,6 @@ exports.crear_empleado = async(req, res) => {
             message: 'La cédula, el celular, la latitud y longitud deben ser datos númericos',
             status: 400
         });
-<<<<<<< HEAD
     }
 
     //resolvemos la promesa
@@ -39,17 +33,6 @@ exports.crear_empleado = async(req, res) => {
         res.json({
             message: err,
             status: 500
-=======
-    } else {
-        //resolvemos la promesa
-        data.then(result => {
-            res.json(result);
-        }).catch(err => {
-            res.json({
-                message: err,
-                status: 500
-            });
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
         });
     });
 };
@@ -85,12 +68,7 @@ exports.agregar_servicios_empleado = async(req, res) => {
 }
 
 // metodo para poder loguearnos como empleados a la base de datos
-<<<<<<< HEAD
 exports.login_empleado = async (req, res) => {
-=======
-exports.login_empleado = async(req, res) => {
-
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
     //obtenemos los campos de la solicitud
     cedula = req.body.cedula;
     contrasenha = req.body.contrasenha;
@@ -103,7 +81,6 @@ exports.login_empleado = async(req, res) => {
             message: 'La cédula debe ser tipo numérico y la contraseña no puede ser vacía',
             status: 400
         });
-<<<<<<< HEAD
     }
 
     //resolvemos la promesa
@@ -139,17 +116,6 @@ exports.restablecer_contrasenha = async (req, res) => {
         res.json({
             status: 400,
             message: 'Contraseña no puede ser vacía'
-=======
-    } else {
-        //resolvemos la promesa
-        data.then(result => {
-            res.json(result);
-        }).catch(err => {
-            res.json({
-                message: err,
-                status: 500
-            });
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
         });
     }
 
