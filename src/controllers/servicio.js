@@ -59,7 +59,7 @@ class Servicio_controller {
         } catch (e) {
             return {
                 status: 500,
-                message: 'error interno del servidor'
+                message: 'Error interno del servidor'
             };
         }
     }
