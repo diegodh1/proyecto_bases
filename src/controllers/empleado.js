@@ -86,7 +86,15 @@ class Empleado_controller {
         let array_servicios = JSON.parse(servicios);
         //recorremos el array_servicios para agregar el servicio uno por uno
         for (let i = 0; i < array_servicios.length; i++) {
-            const values = [trabajador_cedula, array_servicios[i].ocupacion_id, array_servicios[i].servicio_precio_hora, array_servicios[i].servicio_precio_unidad_labor, true, array_servicios[i].servicio_descripcion];
+            const values = [
+                trabajador_cedula, 
+                array_servicios[i].ocupacion_id, 
+                array_servicios[i].servicio_precio_hora, 
+                array_servicios[i].servicio_precio_unidad_labor, 
+                true, 
+                array_servicios[i].servicio_descripcion
+            ];
+
             let data = pool
                 .connect()
                 .then(client => {
@@ -120,6 +128,7 @@ class Empleado_controller {
             const sql = 'SELECT trabajador_contrasenha FROM trabajador WHERE trabajador_cedula = $1';
             const values = [empleado.get_trabajador_cedula()]
             console.log(empleado.get_trabajador_cedula());
+
             let data = pool
                 .connect()
                 .then(client => {
@@ -144,6 +153,7 @@ class Empleado_controller {
                     cedula: 0
                 };
             }
+            
             let contrasenha_decrypt = empleado.contrasenha_decrypt(response.trabajador_contrasenha);
             console.log(contrasenha_decrypt);
             if (contrasenha_decrypt !== contrasenha) {

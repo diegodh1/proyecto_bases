@@ -37,8 +37,7 @@ exports.crear_usuario = async (req, res) => {
 };
 
 //metodo para poder pedir un servicio en la base de datos
-exports.pedir_servicio = async(req, res) => {
-
+exports.pedir_servicio = async (req, res) => {
     //obtenemos los campos de la solicitud
     usuario_id = req.body.usuario_id;
     servicio_nro = req.body.servicio_nro;
@@ -58,17 +57,17 @@ exports.pedir_servicio = async(req, res) => {
             message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
             status: 400
         });
-    } else {
-        //resolvemos la promesa
-        data.then(result => {
-            res.json(result);
-        }).catch(err => {
-            res.json({
-                message: err,
-                status: 500
-            });
-        });
     }
+
+    //resolvemos la promesa
+    data.then(result => {
+        res.json(result);
+    }).catch(err => {
+        res.json({
+            message: err,
+            status: 500
+        });
+    });
 };
 
 // metodo para poder loguearnos como usuarios a la base de datos
