@@ -3,12 +3,8 @@ let empleado = require('../controllers/empleado');
 let Empleado_controller = empleado.Empleado_controller;
 
 // metodo para poder crear un empleado en la base de datos
-<<<<<<< HEAD
-exports.crear_empleado = async (req, res) => {
-=======
 exports.crear_empleado = async(req, res) => {
 
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
     //obtenemos los campos de la solicitud
     cedula = req.body.cedula;
     nombre = req.body.nombre;
@@ -29,17 +25,6 @@ exports.crear_empleado = async(req, res) => {
             message: 'La cédula, el celular, la latitud y longitud deben ser datos númericos',
             status: 400
         });
-<<<<<<< HEAD
-    }
-
-    //resolvemos la promesa
-    data.then(result => {
-        res.json(result);
-    }).catch(err => {
-        res.json({
-            message: err,
-            status: 500
-=======
     } else {
         //resolvemos la promesa
         data.then(result => {
@@ -49,9 +34,8 @@ exports.crear_empleado = async(req, res) => {
                 message: err,
                 status: 500
             });
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
         });
-    });
+    };
 };
 
 // metodo para poder agregar servicios a un empleado
@@ -85,12 +69,8 @@ exports.agregar_servicios_empleado = async(req, res) => {
 }
 
 // metodo para poder loguearnos como empleados a la base de datos
-<<<<<<< HEAD
-exports.login_empleado = async (req, res) => {
-=======
 exports.login_empleado = async(req, res) => {
 
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
     //obtenemos los campos de la solicitud
     cedula = req.body.cedula;
     contrasenha = req.body.contrasenha;
@@ -103,43 +83,6 @@ exports.login_empleado = async(req, res) => {
             message: 'La cédula debe ser tipo numérico y la contraseña no puede ser vacía',
             status: 400
         });
-<<<<<<< HEAD
-    }
-
-    //resolvemos la promesa
-    data.then(result => {
-        res.json(result);
-    }).catch(err => {
-        res.json({
-            message: err,
-            status: 500
-        });
-    });
-}
-
-exports.restablecer_contrasenha = async (req, res) => {
-    cedula = req.body.cedula;
-    contrasenha = req.body.contrasenha;
-
-    if (cedula.toString().length === 0) {
-        res.json({
-            status: 400,
-            message: 'Cedula no puede ser vacía'
-        });
-    }
-
-    if (!Number(cedula)) {
-        res.json({
-            status: 400,
-            message: 'Cédula debe ser tipo numérico'
-        });
-    }
-
-    if (contrasenha === '') {
-        res.json({
-            status: 400,
-            message: 'Contraseña no puede ser vacía'
-=======
     } else {
         //resolvemos la promesa
         data.then(result => {
@@ -149,9 +92,11 @@ exports.restablecer_contrasenha = async (req, res) => {
                 message: err,
                 status: 500
             });
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
         });
     }
+}
+
+exports.restablecer_contrasenha = async(req, res) => {
 
     empleado_controller = new Empleado_controller();
     const data = empleado_controller.restablecer_contrasenha(cedula, contrasenha);
@@ -165,4 +110,33 @@ exports.restablecer_contrasenha = async (req, res) => {
             status: 500
         });
     });
+
+}
+
+exports.aceptar_servicio = async(req, res) => {
+
+    servicio_pedido_id = req.body.servicio_pedido_id;
+    servicio_aceptado_fecha = req.body.servicio_aceptado_fecha;
+
+    empleado_controller = new Empleado_controller();
+    const data = empleado_controller.servicio_aceptar(servicio_pedido_id, servicio_aceptado_fecha);
+
+
+    if (!Number(servicio_pedido_id)) {
+        res.json({
+            message: 'El servicio pedido debe ser un numero',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+
 }

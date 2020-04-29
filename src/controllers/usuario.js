@@ -29,7 +29,7 @@ class Usuario_controller {
                         usuario.contrasenha_ecrypt(),
                         usuario.get_usuario_estado()
                     ]
-                // realizamos la consulta
+                    // realizamos la consulta
                 let data = pool
                     .connect()
                     .then(client => {
@@ -57,13 +57,13 @@ class Usuario_controller {
                 return { info_usuario: { cedula: '', nombre: '', apellido: '' }, status: 500, message: 'error interno del servidor' };
             }
         }
-    // este metodo nos permite loguear al usuario
+        // este metodo nos permite loguear al usuario
     async usuario_login(id, contrasenha) {
         try {
             usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', contrasenha, true);
             //realizamos la consulta
             const sql = 'SELECT usuario_contrasenha FROM usuario WHERE usuario_id = $1';
-            const values = [id]
+            const values = [usuario.get_usuario_id()]
             let data = pool
                 .connect()
                 .then(client => {

@@ -4,33 +4,8 @@ const { pool } = require('../connection');
 
 //CREAMOS LA CLASE CONTROLADORA DE EMPLEADO LA CUAL ES LA QUE VA A COMUNICARSE DIRECTAMENTE CON LA BASE DE DATOS
 class Empleado_controller {
-    constructor() { }
+    constructor() {
 
-<<<<<<< HEAD
-    //METODO QUE PERMITE CREAR UN EMPLEADO NUEVO EN LA BASE DE DATOS
-    async crear_empleado(cedula, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, doc_base64, estado_trabajador, contrasenha, servicios) {
-        try {
-            //creamos el empleado
-            empleado = new Empleado(cedula, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, doc_base64, estado_trabajador, contrasenha, servicios);
-            //realizamos la consulta
-            const sql = 'INSERT INTO trabajador(trabajador_cedula, trabajador_nombre, trabajador_apellido, trabajador_celular, trabajador_correo, trabajador_latitud, trabajador_longitud, trabajador_direccion, trabajador_foto_base64, trabajador_doc_base64, trabajador_estado, trabajador_contrasenha) ' +
-                'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING trabajador_cedula, trabajador_nombre, trabajador_apellido';
-            //obtenemos los valores para asignar
-            const values = [empleado.get_trabajador_cedula(),
-            empleado.get_trabajador_nombre(),
-            empleado.get_trabajador_apellido(),
-            empleado.get_trabajador_celular(),
-            empleado.get_trabajador_correo(),
-            empleado.get_trabajador_latitud(),
-            empleado.get_trabajador_longitud(),
-            empleado.get_trabajador_direccion(),
-            empleado.foto_to_base64(),
-            empleado.doc_to_base64(),
-            empleado.get_trabajador_estado(),
-            empleado.contrasenha_ecrypt()]
-
-            // realizamos la consulta
-=======
         }
         //METODO QUE PERMITE CREAR UN EMPLEADO NUEVO EN LA BASE DE DATOS
     async crear_empleado(cedula, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, doc_base64, estado_trabajador, contrasenha, servicios) {
@@ -94,7 +69,6 @@ class Empleado_controller {
         //recorremos el array_servicios para agregar el servicio uno por uno
         for (let i = 0; i < array_servicios.length; i++) {
             const values = [trabajador_cedula, array_servicios[i].ocupacion_id, array_servicios[i].servicio_precio_hora, array_servicios[i].servicio_precio_unidad_labor, true, array_servicios[i].servicio_descripcion];
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
             let data = pool
                 .connect()
                 .then(client => {
@@ -103,10 +77,6 @@ class Empleado_controller {
                         .then(res => {
                             client.release();
                             console.log(res.rows[0]);
-<<<<<<< HEAD
-=======
-                            return res.rows[0];
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
 
                             return {
                                 info_empleado: res.rows[0],
@@ -117,53 +87,19 @@ class Empleado_controller {
                         })
                         .catch(err => {
                             client.release();
-<<<<<<< HEAD
-
-                            return {
-                                info_empleado: {
-                                    cedula: '',
-                                    nombre: '',
-                                    apellido: ''
-                                },
-                                status: 400,
-                                message: err.detail,
-                                servicios: []
-                            };
-                        })
-                });
-
-            // resolvemos la promesa
-            let response = await data;
-            if (response.status !== 200) {
-                return response;
-            }
-
-            response.servicios = await this.agregar_servicios(empleado.get_trabajador_cedula(), empleado.get_servicios());
-
-            return response;
-        }
-        catch (e) {
-            return { info_empleado: { cedula: '', nombre: '', apellido: '' }, status: 500, message: 'error interno del servidor' };
-=======
                             return [];
                         })
                 });
             //obetenmos la respuesta
             let response = await data;
             list_servicios.push(response);
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
         }
         //eliminamos en caso de duplicados
         return [...new Set(list_servicios)];
     }
 
-<<<<<<< HEAD
-    // este metodo nos permite agregar los servicios que están asociados al empleado
-    async agregar_servicios(trabajador_cedula, servicios) {
-=======
     // este metodo nos permite verificar los servicios que ya tiene el empleado
     async verificar_servicios(trabajador_cedula, servicios) {
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
         //realizamos la consulta
         const sql = 'SELECT * FROM servicio WHERE trabajador_cedula = $1 AND ocupacion_id = $2 AND servicio_estado = true';
         let list_servicios = [];
@@ -198,25 +134,17 @@ class Empleado_controller {
             }
 
         }
-<<<<<<< HEAD
-
-        //eliminamos en caso de duplicados
-        return [...new Set(list_servicios)];
-    }
-
-=======
         //eliminamos en caso de duplicados y agregamos los servicios
         return this.agregar_servicios(cedula, JSON.stringify([...new Set(list_servicios)]));
     }
 
     // este metodo nos permite loguear al usuario
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
     async empleado_login(cedula, contrasenha) {
         try {
             empleado = new Empleado(cedula, '', '', 1, '', 1, 1, '', '', '', true, contrasenha, '');
             //realizamos la consulta
-            const sql = 'SELECT trabajador_contrasenha FROM trabajador WHERE trabajador_cedula = $2';
-            const values = [cedula, empleado.contrasenha_ecrypt()]
+            const sql = 'SELECT trabajador_contrasenha FROM trabajador WHERE trabajador_cedula = $1';
+            const values = [empleado.get_trabajador_cedula()]
             let data = pool
                 .connect()
                 .then(client => {
@@ -242,19 +170,6 @@ class Empleado_controller {
                 return {
                     status: 400,
                     message: "Contraña incorrecta o usuario no registrado en la base de datos",
-<<<<<<< HEAD
-                    cedula: 0
-                };
-            }
-
-            return {
-                status: 200,
-                message: "Ingreso realizado",
-                cedula
-            };
-        }
-        catch (e) {
-=======
                     cedula
                 };
             } else {
@@ -265,7 +180,6 @@ class Empleado_controller {
                 };
             }
         } catch (e) {
->>>>>>> 953dcd6b9633ca6bdc40470a07ba736e9174dfff
             console.log(e);
             return {
                 status: 500,
@@ -281,7 +195,7 @@ class Empleado_controller {
 
             //realizamos la consulta
             const sql = 'UPDATE trabajador SET trabajador_contrasenha = $1 WHERE trabajador_cedula = $2';
-            const values = [empleado.contrasenha_ecrypt(), cedula]
+            const values = [empleado.contrasenha_ecrypt(), empleado.get_trabajador_cedula()]
 
             let data = pool
                 .connect()
@@ -313,14 +227,107 @@ class Empleado_controller {
             }
 
             return response;
-        }
-        catch (e) {
+        } catch (e) {
             return {
                 status: 500,
                 message: "Error interno del servidor"
             }
         }
     }
+
+    //METODO QUE PERMITE CREAR un servicio aceptado en la base de datos
+    async servicio_aceptar(servicio_pedido_id, servicio_aceptado_fecha) {
+
+        let actualizado = await this.update_servicio(servicio_pedido_id, 'ACEPTADO');
+        if (actualizado.status !== 200) {
+
+            return actualizado.message;
+
+        } else {
+
+            try {
+
+                let estado_actualizado = actualizado.estado_servicio;
+                //realizamos la consulta
+                const sql = "INSERT INTO servicio_aceptado(servicio_pedido_id, servicio_aceptado_fecha, estado_servicio_id) " +
+                    "VALUES($1, $2, $3) RETURNING servicio_pedido_id, servicio_aceptado_fecha, estado_servicio_id";
+                //obtenemos los valores para asignar
+                const values = [servicio_pedido_id,
+                        servicio_aceptado_fecha,
+                        estado_actualizado
+                    ]
+                    // realizamos la consulta
+                let data = pool
+                    .connect()
+                    .then(client => {
+                        return client
+                            .query(sql, values)
+                            .then(res => {
+                                client.release();
+                                return { servicio_pedido_id: res.rows[0], status: 200, message: '' };
+
+                            })
+                            .catch(err => {
+                                client.release();
+                                return { servicio_pedido_id: {}, status: 400, message: 'No se pudo aceptar el servicio' };
+                            })
+                    });
+                // resolvemos la promesa
+                let response = await data;
+                if (response.status !== 200) {
+                    return response;
+                } else {
+                    return response;
+                }
+            } catch (e) {
+                return { servicio_pedido_id: {}, status: 500, message: 'error interno del servidor' };
+            }
+
+        }
+
+    }
+
+
+    //METODO QUE ACTUALIZAR EL ESTADO_SERVICIO_ID 
+    async update_servicio(servicio_pedido_id, estado_servicio_id) {
+        try {
+
+            //realizamos la consulta
+            const sql = 'UPDATE servicio_pedido ' +
+                'SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2';
+            //obtenemos los valores para asignar
+            const values = [estado_servicio_id,
+                    servicio_pedido_id
+                ]
+                // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { estado_servicio: estado_servicio_id, status: 200, message: 'Servicio actualizado correctamente' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { estado_servicio: '', status: 400, message: 'No se pudo actualizar el servicio' };
+                        })
+                });
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            } else {
+                return response;
+            }
+        } catch (e) {
+            return { servicio_pedido_id: {}, status: 500, message: 'error interno del servidor' };
+        }
+    }
+
+
 }
 
 //exportamos el modulo
