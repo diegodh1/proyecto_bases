@@ -37,6 +37,7 @@ class Usuario {
         let mykey = crypto.createCipher('aes-128-cbc', 'mypassword');
         let mystr = mykey.update(this.usuario_contrasenha, 'utf8', 'hex')
         mystr += mykey.final('hex');
+
         return mystr;
     }
 
@@ -45,27 +46,30 @@ class Usuario {
         let mykey = crypto.createDecipher('aes-128-cbc', 'mypassword');
         let mystr = mykey.update(password, 'hex', 'utf8')
         mystr += mykey.final('utf8');
+
         return mystr;
     }
-    
+
     // permite leer una foto y convertirlo en base64
     foto_to_base64() {
         try {
             let ruta = path.resolve(__dirname, "../../uploads/fotos/" + this.usuario_foto_base64);
             let data = fs.readFileSync(ruta);
             let base64data = new Buffer.from(data).toString("base64");
+
             return base64data;
         } catch (e) {
             return "";
         }
     }
-    
+
     // permite leer una cedula y convertirla en base64
     recibo_to_base64() {
         try {
             let ruta = path.resolve(__dirname, "../../uploads/recibos/" + this.usuario_recibo_base64);
             let data = fs.readFileSync(ruta);
             let base64data = new Buffer.from(data).toString("base64");
+
             return base64data;
         } catch (e) {
             return "";
