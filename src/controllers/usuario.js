@@ -63,7 +63,7 @@ class Usuario_controller {
             usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', contrasenha, true);
             //realizamos la consulta
             const sql = 'SELECT usuario_contrasenha FROM usuario WHERE usuario_id = $1';
-            const values = [id]
+            const values = [usuario.get_usuario_id()]
             let data = pool
                 .connect()
                 .then(client => {
@@ -82,6 +82,13 @@ class Usuario_controller {
                 });
             //obetenmos la respuesta
             let response = await data;
+            if(response == undefined){
+                return {
+                    status: 400,
+                    message: "Contraña incorrecta o usuario no registrado en la base de datos",
+                    cedula: 0
+                };
+            }
             let contrasenha_decrypt = usuario.contrasenha_decrypt(response.usuario_contrasenha)
             if (contrasenha_decrypt !== contrasenha) {
                 return {

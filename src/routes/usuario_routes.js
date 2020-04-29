@@ -16,7 +16,10 @@ exports.crear_usuario = async(req, res) => {
     contrasenha = req.body.contrasenha;
     usuario_controller = new Usuario_controller();
     let data = usuario_controller.crear_usuario(id, nombre, apellido, celular, correo, latitud, longitud, direccion, id, id, contrasenha, true);
-
+    console.log(id);
+    console.log(celular);
+    console.log(latitud);
+    console.log(longitud);
     if (!Number(id) || !Number(celular) || !Number(latitud) || !Number(longitud)) {
         res.json({
             message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
@@ -75,6 +78,8 @@ exports.login_usuario = async(req, res) => {
     //obtenemos los campos de la solicitud
     id = req.body.id;
     contrasenha = req.body.contrasenha;
+    console.log(id);
+    console.log(contrasenha);
     usuario_controller = new Usuario_controller();
     let data = usuario_controller.usuario_login(id, contrasenha);
 
