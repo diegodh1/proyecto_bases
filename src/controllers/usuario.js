@@ -4,7 +4,7 @@ const { pool } = require('../connection');
 
 //CREAMOS LA CLASE CONTROLADORA DE Usuario LA CUAL ES LA QUE VA A COMUNICARSE DIRECTAMENTE CON LA BASE DE DATOS
 class Usuario_controller {
-    constructor() { }
+    constructor() {}
 
     //METODO QUE PERMITE CREAR UN Usuario NUEVO EN LA BASE DE DATOS
     async crear_usuario(id, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, recibo_base64, contrasenha, estado_usuario) {
@@ -87,12 +87,7 @@ class Usuario_controller {
             usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', contrasenha, true);
             //realizamos la consulta
             const sql = 'SELECT usuario_contrasenha FROM usuario WHERE usuario_id = $1';
-<<<<<<< HEAD
             const values = [usuario.get_usuario_id()]
-=======
-            const values = [id]
-
->>>>>>> 2d76d93414f48507cb93b3b97bfbc8bc749b9faa
             let data = pool
                 .connect()
                 .then(client => {
@@ -114,7 +109,7 @@ class Usuario_controller {
 
             //obetenmos la respuesta
             let response = await data;
-            if(response == undefined){
+            if (response == undefined) {
                 return {
                     status: 400,
                     message: "Contraña incorrecta o usuario no registrado en la base de datos",
