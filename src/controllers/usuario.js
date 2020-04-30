@@ -88,10 +88,6 @@ class Usuario_controller {
             //realizamos la consulta
             const sql = 'SELECT usuario_contrasenha FROM usuario WHERE usuario_id = $1';
             const values = [usuario.get_usuario_id()]
-<<<<<<< HEAD
-=======
-
->>>>>>> test
             let data = pool
                 .connect()
                 .then(client => {
