@@ -26,17 +26,19 @@ exports.crear_usuario = async(req, res) => {
             message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
             status: 400
         });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
     }
 
-    //resolvemos la promesa
-    data.then(result => {
-        res.json(result);
-    }).catch(err => {
-        res.json({
-            message: err,
-            status: 500
-        });
-    });
+
 };
 
 //metodo para poder pedir un servicio en la base de datos
@@ -60,17 +62,21 @@ exports.pedir_servicio = async(req, res) => {
             message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
             status: 400
         });
+    } else {
+
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+
     }
 
-    //resolvemos la promesa
-    data.then(result => {
-        res.json(result);
-    }).catch(err => {
-        res.json({
-            message: err,
-            status: 500
-        });
-    });
+
 };
 
 // metodo para poder loguearnos como usuarios a la base de datos
@@ -86,15 +92,19 @@ exports.login_usuario = async(req, res) => {
             message: 'El id debe ser tipo numérico y la contraseña no puede ser vacia',
             status: 400
         });
+    } else {
+
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+
     }
 
-    //resolvemos la promesa
-    data.then(result => {
-        res.json(result);
-    }).catch(err => {
-        res.json({
-            message: err,
-            status: 500
-        });
-    });
+
 }

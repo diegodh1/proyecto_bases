@@ -4,7 +4,9 @@ const { pool } = require('../connection');
 
 //CREAMOS LA CLASE CONTROLADORA DE EMPLEADO LA CUAL ES LA QUE VA A COMUNICARSE DIRECTAMENTE CON LA BASE DE DATOS
 class Empleado_controller {
-    constructor() { }
+    constructor() {
+
+    }
 
     //METODO QUE PERMITE CREAR UN EMPLEADO NUEVO EN LA BASE DE DATOS
     async crear_empleado(cedula, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, doc_base64, estado_trabajador, contrasenha, servicios) {
@@ -16,17 +18,18 @@ class Empleado_controller {
                 'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING trabajador_cedula, trabajador_nombre, trabajador_apellido';
             //obtenemos los valores para asignar
             const values = [empleado.get_trabajador_cedula(),
-            empleado.get_trabajador_nombre(),
-            empleado.get_trabajador_apellido(),
-            empleado.get_trabajador_celular(),
-            empleado.get_trabajador_correo(),
-            empleado.get_trabajador_latitud(),
-            empleado.get_trabajador_longitud(),
-            empleado.get_trabajador_direccion(),
-            empleado.foto_to_base64(),
-            empleado.doc_to_base64(),
-            empleado.get_trabajador_estado(),
-            empleado.contrasenha_ecrypt()]
+                empleado.get_trabajador_nombre(),
+                empleado.get_trabajador_apellido(),
+                empleado.get_trabajador_celular(),
+                empleado.get_trabajador_correo(),
+                empleado.get_trabajador_latitud(),
+                empleado.get_trabajador_longitud(),
+                empleado.get_trabajador_direccion(),
+                empleado.foto_to_base64(),
+                empleado.doc_to_base64(),
+                empleado.get_trabajador_estado(),
+                empleado.contrasenha_ecrypt()
+            ]
 
             // realizamos la consulta
             let data = pool
@@ -70,8 +73,7 @@ class Empleado_controller {
             response.servicios = await this.agregar_servicios(empleado.get_trabajador_cedula(), empleado.get_servicios());
 
             return response;
-        }
-        catch (e) {
+        } catch (e) {
             return { info_empleado: { cedula: '', nombre: '', apellido: '' }, status: 500, message: 'error interno del servidor' };
         }
     }
@@ -87,11 +89,11 @@ class Empleado_controller {
         //recorremos el array_servicios para agregar el servicio uno por uno
         for (let i = 0; i < array_servicios.length; i++) {
             const values = [
-                trabajador_cedula, 
-                array_servicios[i].ocupacion_id, 
-                array_servicios[i].servicio_precio_hora, 
-                array_servicios[i].servicio_precio_unidad_labor, 
-                true, 
+                trabajador_cedula,
+                array_servicios[i].ocupacion_id,
+                array_servicios[i].servicio_precio_hora,
+                array_servicios[i].servicio_precio_unidad_labor,
+                true,
                 array_servicios[i].servicio_descripcion
             ];
 
@@ -146,14 +148,14 @@ class Empleado_controller {
 
             //obetenmos la respuesta
             let response = await data;
-            if(response == undefined){
+            if (response == undefined) {
                 return {
                     status: 400,
                     message: "Contraña incorrecta o usuario no registrado en la base de datos",
                     cedula: 0
                 };
             }
-            
+
             let contrasenha_decrypt = empleado.contrasenha_decrypt(response.trabajador_contrasenha);
             console.log(contrasenha_decrypt);
             if (contrasenha_decrypt !== contrasenha) {
@@ -169,8 +171,7 @@ class Empleado_controller {
                 message: "Ingreso realizado",
                 cedula
             };
-        }
-        catch (e) {
+        } catch (e) {
             console.log(e);
             return {
                 status: 500,
@@ -186,7 +187,7 @@ class Empleado_controller {
 
             //realizamos la consulta
             const sql = 'UPDATE trabajador SET trabajador_contrasenha = $1 WHERE trabajador_cedula = $2';
-            const values = [empleado.contrasenha_ecrypt(), cedula]
+            const values = [empleado.contrasenha_ecrypt(), empleado.get_trabajador_cedula()]
 
             let data = pool
                 .connect()
@@ -218,14 +219,107 @@ class Empleado_controller {
             }
 
             return response;
-        }
-        catch (e) {
+        } catch (e) {
             return {
                 status: 500,
                 message: "Error interno del servidor"
             }
         }
     }
+
+    //METODO QUE PERMITE CREAR un servicio aceptado en la base de datos
+    async servicio_aceptar(servicio_pedido_id, servicio_aceptado_fecha) {
+
+        let actualizado = await this.update_servicio(servicio_pedido_id, 'ACEPTADO');
+        if (actualizado.status !== 200) {
+
+            return actualizado.message;
+
+        } else {
+
+            try {
+
+                let estado_actualizado = actualizado.estado_servicio;
+                //realizamos la consulta
+                const sql = "INSERT INTO servicio_aceptado(servicio_pedido_id, servicio_aceptado_fecha, estado_servicio_id) " +
+                    "VALUES($1, $2, $3) RETURNING servicio_pedido_id, servicio_aceptado_fecha, estado_servicio_id";
+                //obtenemos los valores para asignar
+                const values = [servicio_pedido_id,
+                        servicio_aceptado_fecha,
+                        estado_actualizado
+                    ]
+                    // realizamos la consulta
+                let data = pool
+                    .connect()
+                    .then(client => {
+                        return client
+                            .query(sql, values)
+                            .then(res => {
+                                client.release();
+                                return { servicio_pedido_id: res.rows[0], status: 200, message: '' };
+
+                            })
+                            .catch(err => {
+                                client.release();
+                                return { servicio_pedido_id: {}, status: 400, message: 'No se pudo aceptar el servicio' };
+                            })
+                    });
+                // resolvemos la promesa
+                let response = await data;
+                if (response.status !== 200) {
+                    return response;
+                } else {
+                    return response;
+                }
+            } catch (e) {
+                return { servicio_pedido_id: {}, status: 500, message: 'error interno del servidor' };
+            }
+
+        }
+
+    }
+
+
+    //METODO QUE ACTUALIZAR EL ESTADO_SERVICIO_ID 
+    async update_servicio(servicio_pedido_id, estado_servicio_id) {
+        try {
+
+            //realizamos la consulta
+            const sql = 'UPDATE servicio_pedido ' +
+                'SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2';
+            //obtenemos los valores para asignar
+            const values = [estado_servicio_id,
+                    servicio_pedido_id
+                ]
+                // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { servicio_id: servicio_pedido_id, estado_servicio: estado_servicio_id, status: 200, message: 'Servicio actualizado correctamente' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { servicio_id: servicio_pedido_id, estado_servicio: '', status: 400, message: 'No se pudo actualizar el servicio' };
+                        })
+                });
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            } else {
+                return response;
+            }
+        } catch (e) {
+            return { servicio_pedido_id: {}, status: 500, message: 'error interno del servidor' };
+        }
+    }
+
+
 }
 
 //exportamos el modulo

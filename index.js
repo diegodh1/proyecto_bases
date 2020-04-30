@@ -25,30 +25,30 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // storage de las cedulas
 let storage_cedulas = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function(req, file, cb) {
         cb(null, 'uploads/cedulas')
     },
-    filename: function (req, file, cb) {
+    filename: function(req, file, cb) {
         cb(null, req.body.cedula)
     }
 })
 
 // storage de las fotos
 let storage_fotos = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function(req, file, cb) {
         cb(null, 'uploads/fotos')
     },
-    filename: function (req, file, cb) {
+    filename: function(req, file, cb) {
         cb(null, req.body.cedula)
     }
 })
 
 // storage de los recibos
 let storage_recibos = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function(req, file, cb) {
         cb(null, 'uploads/recibos')
     },
-    filename: function (req, file, cb) {
+    filename: function(req, file, cb) {
         cb(null, req.body.cedula)
     }
 })
@@ -104,6 +104,10 @@ app.post('/restablecer_contrasenha', empleado_routes.restablecer_contrasenha);
 app.post('/crear_empleado', empleado_routes.crear_empleado);
 // metodo para loguear el empleado a la apliacion
 app.post('/login_empleado', empleado_routes.login_empleado);
+//metodo para aceptar un servicio pedido pedido
+app.post('/aceptar_servicio', empleado_routes.aceptar_servicio);
+//metodo para actualizar un servicio
+app.post('/servicio_update', empleado_routes.servicio_update);
 // este metodo me permite agregar servicios a un trabajador
 app.post('/agregar_servicios_empleado', empleado_routes.agregar_servicios_empleado);
 // metodo para loguear el usuario a la apliacion
@@ -118,6 +122,6 @@ app.post('/filtro_ocupacion', ocupacion_routes.filtro_ocupacion);
 
 
 // corremos el servidor
-app.listen(port, function () {
-  console.log('CORS-enabled web server listening on port 4000');
+app.listen(port, function() {
+    console.log('CORS-enabled web server listening on port 4000');
 })
