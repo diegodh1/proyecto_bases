@@ -307,12 +307,12 @@ class Empleado_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return { estado_servicio: estado_servicio_id, status: 200, message: 'Servicio actualizado correctamente' };
+                            return { servicio_id: servicio_pedido_id, estado_servicio: estado_servicio_id, status: 200, message: 'Servicio actualizado correctamente' };
 
                         })
                         .catch(err => {
                             client.release();
-                            return { estado_servicio: '', status: 400, message: 'No se pudo actualizar el servicio' };
+                            return { servicio_id: servicio_pedido_id, estado_servicio: '', status: 400, message: 'No se pudo actualizar el servicio' };
                         })
                 });
             // resolvemos la promesa

@@ -140,3 +140,30 @@ exports.aceptar_servicio = async(req, res) => {
     }
 
 }
+
+exports.servicio_update = (req, res) => {
+
+    servicio_pedido_id = req.body.servicio_pedido_id;
+    estado_servicio_id = req.body.estado_servicio_id;
+
+    empleado_controller = new Empleado_controller();
+    const data = empleado_controller.update_servicio(servicio_pedido_id, estado_servicio_id);
+
+    if (!Number(servicio_pedido_id)) {
+        res.json({
+            message: 'El servicio pedido debe ser un numero',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+
+}
