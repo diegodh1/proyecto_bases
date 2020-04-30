@@ -56,10 +56,8 @@ class Empleado {
     foto_to_base64() {
         try {
             let ruta = path.resolve(__dirname, "../../uploads/fotos/" + this.trabajador_foto_base64);
-            let data = fs.readFileSync(ruta);
-            let base64data = new Buffer.from(data).toString("base64");
 
-            return base64data;
+            return ruta;
         } catch (e) {
             return "";
         }
@@ -69,10 +67,8 @@ class Empleado {
     doc_to_base64() {
         try {
             let ruta = path.resolve(__dirname, "../../uploads/cedulas/" + this.trabajador_doc_base64);
-            let data = fs.readFileSync(ruta);
-            let base64data = new Buffer.from(data).toString("base64");
 
-            return base64data;
+            return ruta;
         } catch (e) {
             return "";
         }
