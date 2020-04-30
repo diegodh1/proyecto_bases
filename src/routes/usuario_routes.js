@@ -14,9 +14,13 @@ exports.crear_usuario = async(req, res) => {
     longitud = req.body.longitud;
     direccion = req.body.direccion;
     contrasenha = req.body.contrasenha;
+
     usuario_controller = new Usuario_controller();
     let data = usuario_controller.crear_usuario(id, nombre, apellido, celular, correo, latitud, longitud, direccion, id, id, contrasenha, true);
-
+    console.log(id);
+    console.log(celular);
+    console.log(latitud);
+    console.log(longitud);
     if (!Number(id) || !Number(celular) || !Number(latitud) || !Number(longitud)) {
         res.json({
             message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
@@ -33,11 +37,12 @@ exports.crear_usuario = async(req, res) => {
             });
         });
     }
+
+
 };
 
 //metodo para poder pedir un servicio en la base de datos
 exports.pedir_servicio = async(req, res) => {
-
     //obtenemos los campos de la solicitud
     usuario_id = req.body.usuario_id;
     servicio_nro = req.body.servicio_nro;
@@ -58,6 +63,7 @@ exports.pedir_servicio = async(req, res) => {
             status: 400
         });
     } else {
+
         //resolvemos la promesa
         data.then(result => {
             res.json(result);
@@ -67,7 +73,10 @@ exports.pedir_servicio = async(req, res) => {
                 status: 500
             });
         });
+
     }
+
+
 };
 
 // metodo para poder loguearnos como usuarios a la base de datos
@@ -84,6 +93,7 @@ exports.login_usuario = async(req, res) => {
             status: 400
         });
     } else {
+
         //resolvemos la promesa
         data.then(result => {
             res.json(result);
@@ -93,5 +103,8 @@ exports.login_usuario = async(req, res) => {
                 status: 500
             });
         });
+
     }
+
+
 }

@@ -39,6 +39,7 @@ class Empleado {
         let mykey = crypto.createCipher('aes-128-cbc', 'mypassword');
         let mystr = mykey.update(this.trabajador_contrasenha, 'utf8', 'hex')
         mystr += mykey.final('hex');
+
         return mystr;
     }
 
@@ -47,6 +48,7 @@ class Empleado {
         let mykey = crypto.createDecipher('aes-128-cbc', 'mypassword');
         let mystr = mykey.update(password, 'hex', 'utf8')
         mystr += mykey.final('utf8');
+
         return mystr;
     }
 
@@ -56,6 +58,7 @@ class Empleado {
             let ruta = path.resolve(__dirname, "../../uploads/fotos/" + this.trabajador_foto_base64);
             let data = fs.readFileSync(ruta);
             let base64data = new Buffer.from(data).toString("base64");
+
             return base64data;
         } catch (e) {
             return "";
@@ -68,6 +71,7 @@ class Empleado {
             let ruta = path.resolve(__dirname, "../../uploads/cedulas/" + this.trabajador_doc_base64);
             let data = fs.readFileSync(ruta);
             let base64data = new Buffer.from(data).toString("base64");
+
             return base64data;
         } catch (e) {
             return "";
