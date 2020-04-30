@@ -3,7 +3,7 @@ let usuario = require('../controllers/usuario');
 let Usuario_controller = usuario.Usuario_controller;
 
 // metodo para poder crear un usuario en la base de datos
-exports.crear_usuario = async (req, res) => {
+exports.crear_usuario = async(req, res) => {
     //obtenemos los campos de la solicitud
     id = req.body.id;
     nombre = req.body.nombre;
@@ -40,7 +40,7 @@ exports.crear_usuario = async (req, res) => {
 };
 
 //metodo para poder pedir un servicio en la base de datos
-exports.pedir_servicio = async (req, res) => {
+exports.pedir_servicio = async(req, res) => {
     //obtenemos los campos de la solicitud
     usuario_id = req.body.usuario_id;
     servicio_nro = req.body.servicio_nro;
@@ -74,16 +74,10 @@ exports.pedir_servicio = async (req, res) => {
 };
 
 // metodo para poder loguearnos como usuarios a la base de datos
-exports.login_usuario = async (req, res) => {
+exports.login_usuario = async(req, res) => {
     //obtenemos los campos de la solicitud
     id = req.body.id;
     contrasenha = req.body.contrasenha;
-<<<<<<< HEAD
-    console.log(id);
-    console.log(contrasenha);
-=======
-
->>>>>>> 2d76d93414f48507cb93b3b97bfbc8bc749b9faa
     usuario_controller = new Usuario_controller();
     let data = usuario_controller.usuario_login(id, contrasenha);
 
