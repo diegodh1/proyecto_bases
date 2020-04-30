@@ -78,12 +78,8 @@ exports.login_usuario = async (req, res) => {
     //obtenemos los campos de la solicitud
     id = req.body.id;
     contrasenha = req.body.contrasenha;
-<<<<<<< HEAD
     console.log(id);
     console.log(contrasenha);
-=======
-
->>>>>>> 2d76d93414f48507cb93b3b97bfbc8bc749b9faa
     usuario_controller = new Usuario_controller();
     let data = usuario_controller.usuario_login(id, contrasenha);
 
