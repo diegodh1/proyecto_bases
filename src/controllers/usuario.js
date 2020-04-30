@@ -12,9 +12,9 @@ class Usuario_controller {
             //creamos el usuario
             usuario = new Usuario(id, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, recibo_base64, contrasenha, estado_usuario);
             //realizamos la consulta
-            const sql = 'INSERT INTO usuario(usuario_id, usuario_nombre, usuario_apellido, usuario_celular, usuario_correo, usuario_latitud, usuario_longitud, usuario_direccion, usuario_foto_base64, usuario_recibo_base64, usuario_contrasenha, usuario_estado) ' +
-                'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING usuario_id, usuario_nombre, usuario_apellido';
-            //obtenemos los valores para asignar
+            const sql = "INSERT INTO usuario(usuario_id, usuario_nombre, usuario_apellido, usuario_celular, usuario_correo, usuario_latitud, usuario_longitud, usuario_direccion, usuario_point, usuario_foto_base64, usuario_recibo_base64, usuario_contrasenha, usuario_estado) " +
+                "VALUES($1, $2, $3, $4, $5, $6, $7, $8, ST_GeomFromText($9, 4326), $10, $11, $12, $13) RETURNING usuario_id, usuario_nombre, usuario_apellido";
+            //obtenemos los valores para asignar 
             const values = [
                 usuario.get_usuario_id(),
                 usuario.get_usuario_nombre(),
@@ -24,6 +24,7 @@ class Usuario_controller {
                 usuario.get_usuario_latitud(),
                 usuario.get_usuario_longitud(),
                 usuario.get_usuario_direccion(),
+                'POINT(' + usuario.get_usuario_latitud() + ' ' + usuario.get_usuario_longitud() + ')',
                 usuario.foto_to_base64(),
                 usuario.recibo_to_base64(),
                 usuario.contrasenha_ecrypt(),
