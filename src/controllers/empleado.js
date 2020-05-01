@@ -18,18 +18,18 @@ class Empleado_controller {
                 "VALUES($1, $2, $3, $4, $5, $6, $7, $8, ST_GeomFromText($9, 4326), $10, $11, $12, $13) RETURNING trabajador_cedula, trabajador_nombre, trabajador_apellido";
             //obtenemos los valores para asignar
             const values = [empleado.get_trabajador_cedula(),
-                empleado.get_trabajador_nombre(),
-                empleado.get_trabajador_apellido(),
-                empleado.get_trabajador_celular(),
-                empleado.get_trabajador_correo(),
-                empleado.get_trabajador_latitud(),
-                empleado.get_trabajador_longitud(),
-                empleado.get_trabajador_direccion(),
-                'POINT(' + empleado.get_trabajador_latitud() + ' ' + empleado.get_trabajador_longitud() + ')',
-                empleado.foto_to_base64(),
-                empleado.doc_to_base64(),
-                empleado.get_trabajador_estado(),
-                empleado.contrasenha_ecrypt()
+            empleado.get_trabajador_nombre(),
+            empleado.get_trabajador_apellido(),
+            empleado.get_trabajador_celular(),
+            empleado.get_trabajador_correo(),
+            empleado.get_trabajador_latitud(),
+            empleado.get_trabajador_longitud(),
+            empleado.get_trabajador_direccion(),
+            'POINT(' + empleado.get_trabajador_latitud() + ' ' + empleado.get_trabajador_longitud() + ')',
+            empleado.foto_to_base64(),
+            empleado.doc_to_base64(),
+            empleado.get_trabajador_estado(),
+            empleado.contrasenha_ecrypt()
             ]
 
             // realizamos la consulta
@@ -246,10 +246,10 @@ class Empleado_controller {
                     "VALUES($1, $2, $3) RETURNING servicio_pedido_id, servicio_aceptado_fecha, estado_servicio_id";
                 //obtenemos los valores para asignar
                 const values = [servicio_pedido_id,
-                        servicio_aceptado_fecha,
-                        estado_actualizado
-                    ]
-                    // realizamos la consulta
+                    servicio_aceptado_fecha,
+                    estado_actualizado
+                ]
+                // realizamos la consulta
                 let data = pool
                     .connect()
                     .then(client => {
@@ -290,9 +290,9 @@ class Empleado_controller {
                 'SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2';
             //obtenemos los valores para asignar
             const values = [estado_servicio_id,
-                    servicio_pedido_id
-                ]
-                // realizamos la consulta
+                servicio_pedido_id
+            ]
+            // realizamos la consulta
             let data = pool
                 .connect()
                 .then(client => {
@@ -310,16 +310,107 @@ class Empleado_controller {
                 });
             // resolvemos la promesa
             let response = await data;
-            if (response.status !== 200) {
-                return response;
-            } else {
-                return response;
-            }
+            return response;
+            
         } catch (e) {
             return { servicio_pedido_id: {}, status: 500, message: 'error interno del servidor' };
         }
     }
+    //METODO QUE DA LOS EMPLEADOS MÁS CERCANOS AL USUARIO DE ACUERDO AL SERVICIO
+    async empleados_cercanos(id_usuario, ocupacion_id, limite) {
+        try {
+            const sql = "WITH trabajadores_cerca AS (" +
+                "SELECT " +
+                "trabajador.trabajador_cedula," +
+                "trabajador.trabajador_nombre," +
+                "trabajador.trabajador_apellido," +
+                "trabajador.trabajador_direccion," +
+                "trabajador.trabajador_latitud," +
+                "trabajador.trabajador_longitud," +
+                "trabajador.trabajador_point," +
+                "round(CAST(ST_DistanceSphere(ST_Centroid(trabajador.trabajador_point)," +
+                "ST_Centroid($1)) As numeric),4) AS distancia FROM trabajador " +
+                "WHERE trabajador.trabajador_cedula IN " +
+                "(SELECT servicio.trabajador_cedula FROM servicio WHERE servicio.ocupacion_id = $2) " +
+                "AND trabajador.trabajador_estado = true"
+            "ORDER BY trabajador.trabajador_point <-> $3::geometry LIMIT $4); " +
+                "WITH trabajadores_elegidos AS " +
+                "(SELECT trabajadores_cerca.trabajador_cedula, trabajadores_cerca.trabajador_nombre, " +
+                "trabajadores_cerca.trabajador_apellido, trabajadores_cerca.trabajador_direccion, " +
+                "trabajadores_cerca.trabajador_latitud, trabajadores_cerca.trabajador_longitud"
+            "FROM trabajadores_cerca WHERE trabajadores_cerca.distancia < 12000 " +
+                "ORDER BY ST_Distance(trabajador_point, $5::geometry) LIMIT $6);" +
+                "SELECT trabajadores_elegidos.*, servicio.servicio_nro, servicio.servicio_precio_hora," +
+                "servicio.servicio_precio_unidad_labor, servicio.servicio_descripcion" +
+                "FROM trabajadores_elegidos NATURAL JOIN servicio " +
+                "WHERE servicio.servicio_estado = true AND servicio.ocupacion_id = $7";
+            const usuario = await usuario_point(id_usuario);
+            const values = [
+                'SRID=4326;POINT(' + usuario.usuario_latitud + ' ' + usuario.usuario_longitud + ')',
+                ocupacion_id,
+                'SRID=4326;POINT(' + usuario.usuario_latitud + ' ' + usuario.usuario_longitud + ')',
+                parseInt(limite) * 2,
+                'SRID=4326;POINT(' + usuario.usuario_latitud + ' ' + usuario.usuario_longitud + ')',
+                parseInt(limite),
+                ocupacion_id
+            ];
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { trabajadores: res.rows, status: 200 };
 
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { trabajadores: [], status: 400 };
+                        })
+                });
+
+            let response = await data;
+            return response;
+        }
+        catch (e) {
+            console.log(e);
+            return {
+                message: "Error interno del servidor",
+                trabajadores: [],
+                status: 500
+            };
+        }
+
+    }
+    //METODO QUE ME RETORNA LA LATITUD Y LA LONGITUD DEL USUARIO
+    async usuario_point(id_usuario) {
+        try {
+            const sql = "SELECT usuario_latitud, usuario_longitud FROM usuario WHERE usuario_estado = true AND usuario_id = $1";
+            const values = [parseInt(id_usuario)];
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return res.rows[0];
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { usuario_latitud: 0, usuario_longitud: 0 };
+                        })
+                });
+            // resolvemos la promesa
+            let response = await data;
+            return response;
+        }
+        catch (e) {
+            console.log(e);
+            return { usuario_latitud: 0, usuario_longitud: 0 };
+        }
+    }
 
 }
 

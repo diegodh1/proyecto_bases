@@ -104,6 +104,8 @@ app.post('/restablecer_contrasenha', empleado_routes.restablecer_contrasenha);
 app.post('/crear_empleado', empleado_routes.crear_empleado);
 // metodo para loguear el empleado a la apliacion
 app.post('/login_empleado', empleado_routes.login_empleado);
+// metodo para dar los empleados mas cercanos a un usuario
+app.post('/empleados_cercanos', empleado_routes.empleados_cercanos);
 //metodo para aceptar un servicio pedido pedido
 app.post('/aceptar_servicio', empleado_routes.aceptar_servicio);
 //metodo para actualizar un servicio

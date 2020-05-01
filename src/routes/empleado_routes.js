@@ -90,6 +90,33 @@ exports.login_empleado = async(req, res) => {
         });
     }
 }
+// metodo que permite dar los trabajadores mas cercanos de acuerdo a la posición del usuario y el servicio que ofrecen
+exports.login_empleado = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    id_usuario = req.body.id_usuario;
+    ocupacion_id = req.body.ocupacion_id;
+    limite = req.body.limite;
+
+    empleado_controller = new Empleado_controller();
+    const data = empleado_controller.empleados_cercanos(id_usuario, ocupacion_id, limite);
+
+    if (!Number(id_usuario)) {
+        res.json({
+            message: 'La cédula debe ser tipo numérico y la contraseña no puede ser vacía',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+}
 
 exports.restablecer_contrasenha = async(req, res) => {
 
