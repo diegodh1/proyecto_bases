@@ -91,7 +91,7 @@ exports.login_empleado = async(req, res) => {
     }
 }
 // metodo que permite dar los trabajadores mas cercanos de acuerdo a la posición del usuario y el servicio que ofrecen
-exports.login_empleado = async(req, res) => {
+exports.empleados_cercanos = async(req, res) => {
     //obtenemos los campos de la solicitud
     id_usuario = req.body.id_usuario;
     ocupacion_id = req.body.ocupacion_id;

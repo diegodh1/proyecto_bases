@@ -92,8 +92,8 @@ class Empleado_controller {
             const values = [
                 trabajador_cedula,
                 array_servicios[i].ocupacion_id,
-                array_servicios[i].servicio_precio_hora,
-                array_servicios[i].servicio_precio_unidad_labor,
+                parseFloat(array_servicios[i].servicio_precio_hora),
+                parseFloat(array_servicios[i].servicio_precio_unidad_labor),
                 true,
                 array_servicios[i].servicio_descripcion
             ];
@@ -320,37 +320,33 @@ class Empleado_controller {
     async empleados_cercanos(id_usuario, ocupacion_id, limite) {
         try {
             const sql = "WITH trabajadores_cerca AS (" +
-                "SELECT " +
-                "trabajador.trabajador_cedula," +
-                "trabajador.trabajador_nombre," +
-                "trabajador.trabajador_apellido," +
-                "trabajador.trabajador_direccion," +
-                "trabajador.trabajador_latitud," +
-                "trabajador.trabajador_longitud," +
-                "trabajador.trabajador_point," +
+                "SELECT trabajador.trabajador_cedula,trabajador.trabajador_nombre, " +
+                "trabajador.trabajador_apellido,trabajador.trabajador_celular," +
+                "trabajador.trabajador_direccion,trabajador.trabajador_latitud," +
+                "trabajador.trabajador_longitud,trabajador.trabajador_point," +
                 "round(CAST(ST_DistanceSphere(ST_Centroid(trabajador.trabajador_point)," +
                 "ST_Centroid($1)) As numeric),4) AS distancia FROM trabajador " +
                 "WHERE trabajador.trabajador_cedula IN " +
                 "(SELECT servicio.trabajador_cedula FROM servicio WHERE servicio.ocupacion_id = $2) " +
-                "AND trabajador.trabajador_estado = true"
-            "ORDER BY trabajador.trabajador_point <-> $3::geometry LIMIT $4); " +
-                "WITH trabajadores_elegidos AS " +
-                "(SELECT trabajadores_cerca.trabajador_cedula, trabajadores_cerca.trabajador_nombre, " +
-                "trabajadores_cerca.trabajador_apellido, trabajadores_cerca.trabajador_direccion, " +
-                "trabajadores_cerca.trabajador_latitud, trabajadores_cerca.trabajador_longitud"
-            "FROM trabajadores_cerca WHERE trabajadores_cerca.distancia < 12000 " +
-                "ORDER BY ST_Distance(trabajador_point, $5::geometry) LIMIT $6);" +
-                "SELECT trabajadores_elegidos.*, servicio.servicio_nro, servicio.servicio_precio_hora," +
-                "servicio.servicio_precio_unidad_labor, servicio.servicio_descripcion" +
-                "FROM trabajadores_elegidos NATURAL JOIN servicio " +
-                "WHERE servicio.servicio_estado = true AND servicio.ocupacion_id = $7";
-            const usuario = await usuario_point(id_usuario);
+                "AND trabajador.trabajador_estado = true " +
+                "ORDER BY trabajador.trabajador_point <-> $3::geometry LIMIT $4) " +
+                "select * from (SELECT trabajadores_cerca.trabajador_cedula as trabajador_cedula, trabajadores_cerca.trabajador_nombre as trabajador_nombre, "+
+                "trabajadores_cerca.trabajador_apellido as trabajador_apellido, trabajadores_cerca.trabajador_direccion as trabajador_direccion, "+
+                "trabajadores_cerca.trabajador_latitud as trabajador_latitud, trabajadores_cerca.trabajador_longitud as trabajador_longitud "+
+                "FROM trabajadores_cerca WHERE trabajadores_cerca.distancia < 12000 "+
+                "ORDER BY ST_Distance(trabajadores_cerca.trabajador_point, $5::geometry) LIMIT $6) as r1 "+
+                "natural join "+
+                "(SELECT trabajadores_cerca.trabajador_cedula as trabajador_cedula, servicio.servicio_nro as servicio_nro, servicio.servicio_precio_hora as servicio_precio_hora, "+
+                "servicio.servicio_precio_unidad_labor as servicio_precio_unidad_labor, servicio.servicio_descripcion as servicio_descripcion "+
+                "FROM trabajadores_cerca NATURAL JOIN servicio "+
+                "WHERE servicio.servicio_estado = true AND servicio.ocupacion_id = $7) as r2";
+            const usuario = await this.usuario_point(id_usuario);
             const values = [
-                'SRID=4326;POINT(' + usuario.usuario_latitud + ' ' + usuario.usuario_longitud + ')',
+                "SRID=4326;POINT(" + usuario.usuario_latitud + " " + usuario.usuario_longitud + ")",
                 ocupacion_id,
-                'SRID=4326;POINT(' + usuario.usuario_latitud + ' ' + usuario.usuario_longitud + ')',
+                "SRID=4326;POINT(" + usuario.usuario_latitud + " " + usuario.usuario_longitud + ")",
                 parseInt(limite) * 2,
-                'SRID=4326;POINT(' + usuario.usuario_latitud + ' ' + usuario.usuario_longitud + ')',
+                "SRID=4326;POINT(" + usuario.usuario_latitud + " " + usuario.usuario_longitud + ")",
                 parseInt(limite),
                 ocupacion_id
             ];
