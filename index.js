@@ -112,12 +112,18 @@ app.post('/aceptar_servicio', empleado_routes.aceptar_servicio);
 app.post('/servicio_update', empleado_routes.servicio_update);
 // este metodo me permite agregar servicios a un trabajador
 app.post('/agregar_servicios_empleado', empleado_routes.agregar_servicios_empleado);
+// este metodo me permite obtener toda la informacion de un empleado
+app.post('/informacion_empleado', empleado_routes.informacion_empleado);
 // metodo para loguear el usuario a la apliacion
 app.post('/login_usuario', usuario_routes.login_usuario);
 // este metodo me permite crear un usuario en la base de datos
 app.post('/crear_usuario', usuario_routes.crear_usuario);
-//// este metodo nos permite crear el pedido de un servicio
+// este metodo nos permite crear el pedido de un servicio
 app.post('/pedir_servicio', usuario_routes.pedir_servicio);
+// este metodo nos permite crear el pago de un servicio
+app.post('/pagar_servicio', usuario_routes.pagar_servicio);
+// este metodo nos permite cambiar directamente el estado_servicio_id directamente a un servicio pedido
+app.post('/modificar_estado_servicio', usuario_routes.modificar_estado_servicio);
 // este metodo me permite filtrar la lista de ocupacion
 app.post('/filtro_ocupacion', ocupacion_routes.filtro_ocupacion);
 

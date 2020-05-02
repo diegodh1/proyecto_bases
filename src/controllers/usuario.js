@@ -355,7 +355,104 @@ class Usuario_controller {
             };
         }
     }
+
+
+    //METODO QUE PERMITE PAGAR un servicio en la base
+    async servicio_pagar(servicio_pedido_id, pago_fecha, pago_valor) {
+
+        let pagado = await this.servicio_update(servicio_pedido_id, 'FINALIZADO')
+        if (pagado.status !== 200) {
+            return pagado.message;
+        } else {
+
+            try {
+
+                //realizamos la consulta
+                const sql = "INSERT INTO pago(servicio_pedido_id, pago_fecha, pago_valor) SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2 " +
+                    "VALUES($1, $2, $3) RETURNING servicio_pedido_id, pago_fecha, pago_valor";
+                //obtenemos los valores para asignar
+                const values = [
+                    servicio_pedido_id,
+                    pago_fecha,
+                    pago_valor
+                ]
+
+                // realizamos la consulta
+                let data = pool
+                    .connect()
+                    .then(client => {
+                        return client
+                            .query(sql, values)
+                            .then(res => {
+                                client.release();
+                                return { ingo_pago: res.rows[0], status: 200, message: 'Pago realizado con exito' };
+
+                            })
+                            .catch(err => {
+                                client.release();
+                                return { ingo_pago: {}, status: 400, message: 'No se pudo pagar el servicio' };
+                            })
+                    });
+
+                // resolvemos la promesa
+                let response = await data;
+                if (response.status !== 200) {
+                    return response;
+                } else {
+                    return response;
+                }
+
+            } catch (e) {
+                return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'error interno del servidor' };
+            }
+
+        }
+
+    }
+
+    //METODO QUE PERMITE Actualizar un servicio_pedido
+    async servicio_update(servicio_pedido_id, estado_servicio) {
+        try {
+
+            //realizamos la consulta
+            const sql = "UPDATE servicio_pedido SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2";
+            //obtenemos los valores para asignar
+            const values = [
+                estado_servicio,
+                servicio_pedido_id
+            ]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { servicio_id: servicio_pedido_id, estado_servicio: estado_servicio_id, status: 200, message: 'Servicio actualizado correctamente' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { servicio_id: servicio_pedido_id, estado_servicio: '', status: 400, message: 'No se pudo actualizar el servicio' };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            return response;
+
+        } catch (e) {
+            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'error interno del servidor' };
+        }
+    }
+
+
+
+
 }
+
 
 //exportamos el modulo
 exports.Usuario_controller = Usuario_controller;

@@ -79,6 +79,36 @@ exports.pedir_servicio = async(req, res) => {
 
 };
 
+// metodo para poder pagar un servicio
+exports.pagar_servicio = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    servicio_pedido_id = req.body.servicio_pedido_id;
+    pago_fecha = req.body.pago_fecha;
+    pago_valor = req.body.pago_valor;
+
+    usuario_controller = new Usuario_controller();
+    let data = usuario_controller.servicio_pagar(servicio_pedido_id, pago_fecha, pago_valor);
+
+    if (!Number(servicio_pedido_id) || !Number(pago_valor)) {
+        res.json({
+            message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+
+
+};
+
 // metodo para poder loguearnos como usuarios a la base de datos
 exports.login_usuario = async(req, res) => {
     //obtenemos los campos de la solicitud
@@ -90,6 +120,37 @@ exports.login_usuario = async(req, res) => {
     if (!Number(id) || contrasenha === '') {
         res.json({
             message: 'El id debe ser tipo numérico y la contraseña no puede ser vacia',
+            status: 400
+        });
+    } else {
+
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+
+    }
+
+
+}
+
+// este metodo nos permite cambiar directamente el estado_servicio_id directamente a un servicio pedido
+exports.modificar_estado_servicio = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    servicio_pedido_id = req.body.servicio_pedido_id;
+    estado_servicio = req.body.estado_servicio;
+
+    usuario_controller = new Usuario_controller();
+    let data = usuario_controller.servicio_update(servicio_pedido_id, estado_servicio);
+
+    if (!Number(servicio_pedido_id)) {
+        res.json({
+            message: 'El id debe ser tipo numérico',
             status: 400
         });
     } else {

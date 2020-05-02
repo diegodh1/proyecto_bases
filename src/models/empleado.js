@@ -52,8 +52,8 @@ class Empleado {
         return mystr;
     }
 
-    // permite leer una foto y convertirlo en base64
-    foto_to_base64() {
+    // permite leer una foto y convertirlo en path
+    foto_to_path() {
         try {
             let ruta = path.resolve(__dirname, "../../uploads/fotos/" + this.trabajador_foto_base64);
 
@@ -63,12 +63,36 @@ class Empleado {
         }
     }
 
-    // permite leer una cedula y convertirla en base64
-    doc_to_base64() {
+    // permite leer una cedula y convertirla en path
+    doc_to_path() {
         try {
             let ruta = path.resolve(__dirname, "../../uploads/cedulas/" + this.trabajador_doc_base64);
 
             return ruta;
+        } catch (e) {
+            return "";
+        }
+    }
+
+    // permite leer una foto y convertirlo en base64
+    foto_to_base64(ruta) {
+        try {
+            let data = fs.readFileSync(ruta);
+            let base64data = new Buffer.from(data).toString("base64");
+
+            return base64data;
+        } catch (e) {
+            return "";
+        }
+    }
+
+    // permite leer una cedula y convertirla en base64
+    doc_to_base64(ruta) {
+        try {
+            let data = fs.readFileSync(ruta);
+            let base64data = new Buffer.from(data).toString("base64");
+
+            return base64data;
         } catch (e) {
             return "";
         }

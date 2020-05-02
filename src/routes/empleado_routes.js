@@ -66,31 +66,31 @@ exports.agregar_servicios_empleado = async(req, res) => {
 
 // metodo para poder loguearnos como empleados a la base de datos
 exports.login_empleado = async(req, res) => {
-    //obtenemos los campos de la solicitud
-    cedula = req.body.cedula;
-    contrasenha = req.body.contrasenha;
+        //obtenemos los campos de la solicitud
+        cedula = req.body.cedula;
+        contrasenha = req.body.contrasenha;
 
-    empleado_controller = new Empleado_controller();
-    const data = empleado_controller.empleado_login(cedula, contrasenha);
+        empleado_controller = new Empleado_controller();
+        const data = empleado_controller.empleado_login(cedula, contrasenha);
 
-    if (!Number(cedula) || contrasenha === '') {
-        res.json({
-            message: 'La cédula debe ser tipo numérico y la contraseña no puede ser vacía',
-            status: 400
-        });
-    } else {
-        //resolvemos la promesa
-        data.then(result => {
-            res.json(result);
-        }).catch(err => {
+        if (!Number(cedula) || contrasenha === '') {
             res.json({
-                message: err,
-                status: 500
+                message: 'La cédula debe ser tipo numérico y la contraseña no puede ser vacía',
+                status: 400
             });
-        });
+        } else {
+            //resolvemos la promesa
+            data.then(result => {
+                res.json(result);
+            }).catch(err => {
+                res.json({
+                    message: err,
+                    status: 500
+                });
+            });
+        }
     }
-}
-// metodo que permite dar los trabajadores mas cercanos de acuerdo a la posición del usuario y el servicio que ofrecen
+    // metodo que permite dar los trabajadores mas cercanos de acuerdo a la posición del usuario y el servicio que ofrecen
 exports.empleados_cercanos = async(req, res) => {
     //obtenemos los campos de la solicitud
     id_usuario = req.body.id_usuario;
@@ -188,4 +188,31 @@ exports.servicio_update = (req, res) => {
         });
     }
 
+}
+
+// metodo que permite obtener la informacion de un empleado
+exports.informacion_empleado = async(req, res) => {
+
+    //obtenemos los campos de la solicitud
+    servicio_nro = req.body.servicio_nro;
+
+    empleado_controller = new Empleado_controller();
+    const data = empleado_controller.empleado_informacion(servicio_nro);
+
+    if (!Number(id_usuario)) {
+        res.json({
+            message: 'La cédula debe ser tipo numérico y la contraseña no puede ser vacía',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
 }
