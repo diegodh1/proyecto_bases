@@ -91,7 +91,7 @@ exports.pagar_servicio = async(req, res) => {
 
     if (!Number(servicio_pedido_id) || !Number(pago_valor)) {
         res.json({
-            message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
+            message: 'El id y el pago deben ser datos númericos',
             status: 400
         });
     } else {

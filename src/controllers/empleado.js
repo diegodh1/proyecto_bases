@@ -245,7 +245,7 @@ class Empleado_controller {
                 const sql = "INSERT INTO servicio_aceptado(servicio_pedido_id, servicio_aceptado_fecha, estado_servicio_id) " +
                     "VALUES($1, $2, $3) RETURNING servicio_pedido_id, servicio_aceptado_fecha, estado_servicio_id";
                 //obtenemos los valores para asignar
-                const values = [servicio_pedido_id,
+                const values = [parseInt(servicio_pedido_id),
                         servicio_aceptado_fecha,
                         estado_actualizado
                     ]
@@ -290,7 +290,7 @@ class Empleado_controller {
                 'SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2';
             //obtenemos los valores para asignar
             const values = [estado_servicio_id,
-                    servicio_pedido_id
+                    parseInt(servicio_pedido_id)
                 ]
                 // realizamos la consulta
             let data = pool

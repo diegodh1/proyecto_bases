@@ -362,20 +362,22 @@ class Usuario_controller {
     async servicio_pagar(servicio_pedido_id, pago_fecha, pago_valor) {
 
         let pagado = await this.servicio_update(servicio_pedido_id, 'FINALIZADO')
-        if (pagado.status !== 200) {
+        let pagado_aceptado = await this.servicio_aceptado_update(servicio_pedido_id, 'FINALIZADO');
+        if (pagado.status !== 200 || pagado_aceptado.status !== 200) {
             return pagado.message;
         } else {
+            console.log("entro por aca");
 
             try {
 
                 //realizamos la consulta
-                const sql = "INSERT INTO pago(servicio_pedido_id, pago_fecha, pago_valor) SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2 " +
+                const sql = "INSERT INTO pago(servicio_pedido_id, pago_fecha, pago_valor) " +
                     "VALUES($1, $2, $3) RETURNING servicio_pedido_id, pago_fecha, pago_valor";
                 //obtenemos los valores para asignar
                 const values = [
-                    servicio_pedido_id,
+                    parseInt(servicio_pedido_id),
                     pago_fecha,
-                    pago_valor
+                    parseFloat(pago_valor)
                 ]
 
                 // realizamos la consulta
@@ -420,7 +422,7 @@ class Usuario_controller {
             //obtenemos los valores para asignar
             const values = [
                 estado_servicio,
-                servicio_pedido_id
+                parseInt(servicio_pedido_id)
             ]
 
             // realizamos la consulta
@@ -431,12 +433,50 @@ class Usuario_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return { servicio_id: servicio_pedido_id, estado_servicio: estado_servicio_id, status: 200, message: 'Servicio actualizado correctamente' };
+                            return { servicio_id: servicio_pedido_id, estado_servicio_id: estado_servicio, status: 200, message: 'Servicio actualizado correctamente' };
 
                         })
                         .catch(err => {
                             client.release();
-                            return { servicio_id: servicio_pedido_id, estado_servicio: '', status: 400, message: 'No se pudo actualizar el servicio' };
+                            return { servicio_id: servicio_pedido_id, estado_servicio_id: '', status: 400, message: 'No se pudo actualizar el servicio' };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            return response;
+
+        } catch (e) {
+            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'error interno del servidor' };
+        }
+    }
+
+    //METODO QUE PERMITE Actualizar un servicio_pedido
+    async servicio_aceptado_update(servicio_pedido_id, estado_servicio) {
+        try {
+
+            //realizamos la consulta
+            const sql = "UPDATE servicio_aceptado SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2";
+            //obtenemos los valores para asignar
+            const values = [
+                estado_servicio,
+                parseInt(servicio_pedido_id)
+            ]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { servicio_id: servicio_pedido_id, estado_servicio_id: estado_servicio, status: 200, message: 'Servicio actualizado correctamente' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { servicio_id: servicio_pedido_id, estado_servicio_id: '', status: 400, message: 'No se pudo actualizar el servicio' };
                         })
                 });
 
