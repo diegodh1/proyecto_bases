@@ -114,7 +114,7 @@ class Usuario_controller {
                 return {
                     status: 400,
                     message: "Contraña incorrecta o usuario no registrado en la base de datos",
-                    cedula: 0
+                    id: id
                 };
             }
             let contrasenha_decrypt = usuario.contrasenha_decrypt(response.usuario_contrasenha)
@@ -122,19 +122,20 @@ class Usuario_controller {
                 return {
                     status: 400,
                     message: "Contraña incorrecta o usuario no registrado en la base de datos",
-                    id
+                    id: id
                 };
             }
 
             return {
                 status: 200,
                 message: "Ingreso realizado",
-                id
+                id: id
             };
         } catch (e) {
             console.log(e);
 
             return {
+                id: id,
                 status: 500,
                 message: "Error interno del servidor",
             };
