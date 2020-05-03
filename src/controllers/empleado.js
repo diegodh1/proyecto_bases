@@ -413,15 +413,14 @@ class Empleado_controller {
         try {
             empleado = new Empleado(-1, '', '', 1, '', 1, 1, '', '', '', true, '', '');
             //realizamos la consulta
-            const sql = "SELECT trabajador_nombre, trabajador_apellido, trabajador_celular, trabajador_direccion, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, promedio, trabajador_foto_base64, trabajador_latitud, trabajador_longitud " +
-                "FROM trabajador NATURAL JOIN " +
-                "(SELECT trabajador_cedula, servicio_precio_hora, servicio_precio_unidad_labor, servicio_descripcion, promedio " +
-                "FROM servicio NATURAL JOIN (SELECT servicio_nro, AVG(puntuacion_calificacion) AS promedio FROM puntuacion WHERE servicio_nro = $1 " +
-                "GROUP BY servicio_nro) AS puntos) " +
-                "AS infoservicio";
+            const sql = "SELECT tr.trabajador_cedula, (tr.trabajador_nombre||' '||tr.trabajador_apellido) as trabajador_nombre, tr.trabajador_direccion,"+
+            "tr.trabajador_latitud, tr.trabajador_longitud, tr.trabajador_celular, tr.trabajador_foto_base64,"+
+            "(SELECT CASE WHEN AVG(puntuacion_calificacion) IS NULL THEN 0 ELSE  ROUND(AVG(puntuacion_calificacion)::numeric,1) END "+
+            "FROM puntuacion WHERE puntuacion.servicio_nro = servicio.servicio_nro) as puntuacion FROM servicio NATURAL JOIN trabajador as tr "+
+            "WHERE servicio_nro = $1";
 
             //obtenemos los valores para asignar
-            const values = [servicio_nro]
+            const values = [parseInt(servicio_nro)]
                 // realizamos la consulta
             let data = pool
                 .connect()
@@ -430,44 +429,27 @@ class Empleado_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return res.rows[0];
+                            return {trabajador: res.rows[0], status:200, message: 'operación realizada'};
 
                         })
                         .catch(err => {
                             client.release();
-                            return {};
+                            return {trabajador:{}, status:400, message: 'No se pudo encontrar la información'};
                         })
                 });
 
             let response = await data;
             // resolvemos la promesa
-            if (response.length == 0) {
-                return { info_empleado: response, status: 400, message: "Informacion de empleado no encontrada" };
+            if (response.status == 400) {
+                return response
             } else {
-                let fotoenbase64 = empleado.foto_to_base64(response[8]);
-
-                return {
-                    info_empleado: {
-                        nombre: response[0],
-                        apellido: response[1],
-                        celular: response[2],
-                        direccion: response[3],
-                        precio_hora: response[4],
-                        precio_unidad_labor: response[5],
-                        descripcion: response[6],
-                        promedio: response[7],
-                        foto_base64: fotoenbase64,
-                        latitud: response[9],
-                        longitud: response[10]
-                    },
-                    status: 200,
-                    message: "Informacion de empleado encontrada"
-                };
+                let base64 = empleado.foto_to_base64(response.trabajador.trabajador_foto_base64);
+                response.trabajador.trabajador_foto_base64 = base64;
+                return response;
             }
 
-
         } catch (e) {
-            return { servicio_pedido_id: {}, status: 500, message: 'error interno del servidor' };
+            return {trabajador: {}, status:500, message: 'error interno del servidor'};
         }
     }
 
