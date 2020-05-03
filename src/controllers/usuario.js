@@ -425,10 +425,9 @@ class Usuario_controller {
             const sql = "SELECT servicio_pedido_id FROM " +
                 "(SELECT servicio_pedido_id, servicio_pedido_fecha, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE " +
                 "(estado_servicio_id = 'PENDIENTE' OR estado_servicio_id = 'ACEPTADO' OR estado_servicio_id = 'OCUPADO') AND usuario_id = $1) AS procesados " +
-                "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4 AND $5 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
-                "(servicio_pedido_es_por_hora = true AND $6 AND (servicio_pedido_fecha - $7 * INTERVAL '1 hour' < $8 AND $9 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
-                "(servicio_pedido_es_por_hora = false AND $10 AND ( servicio_pedido_fecha - INTERVAL '3 hour' < $11 AND $12 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
-                "(servicio_pedido_es_por_hora = true AND $13 AND (servicio_pedido_fecha - INTERVAL '3 hour' < $14 AND $15 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
+                "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4 )) OR " +
+                "(servicio_pedido_es_por_hora = true AND $5 AND (servicio_pedido_fecha - $6 * INTERVAL '1 hour' < $7 AND $8 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
+                "(servicio_pedido_es_por_hora = true AND $9 AND ($10 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
 
             //obtenemos los valores para asignar
             const values = [
@@ -436,14 +435,10 @@ class Usuario_controller {
                 es_por_hora,
                 parseInt(servicio_horas),
                 servicio_pedido_fecha,
-                servicio_pedido_fecha,
                 es_por_hora,
                 parseInt(servicio_horas),
                 servicio_pedido_fecha,
                 servicio_pedido_fecha, !es_por_hora,
-                servicio_pedido_fecha,
-                servicio_pedido_fecha, !es_por_hora,
-                servicio_pedido_fecha,
                 servicio_pedido_fecha
             ]
 
@@ -506,10 +501,9 @@ class Usuario_controller {
                     "(SELECT servicio_nro, trabajador_cedula FROM servicio WHERE trabajador_cedula = $1) AS procesado_final NATURAL JOIN " +
                     "(SELECT servicio_nro, servicio_pedido_id, servicio_pedido_fecha, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE " +
                     "estado_servicio_id = 'ACEPTADO' OR estado_servicio_id = 'OCUPADO') AS procesados " +
-                    "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4 AND $5 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
-                    "(servicio_pedido_es_por_hora = true AND $6 AND (servicio_pedido_fecha - $7 * INTERVAL '1 hour' < $8 AND $9 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
-                    "(servicio_pedido_es_por_hora = false AND $10 AND ( servicio_pedido_fecha - INTERVAL '3 hour' < $11 AND $12 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
-                    "(servicio_pedido_es_por_hora = true AND $13 AND (servicio_pedido_fecha - INTERVAL '3 hour' < $14 AND $15 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
+                    "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4)) OR " +
+                    "(servicio_pedido_es_por_hora = true AND $5 AND (servicio_pedido_fecha - $6 * INTERVAL '1 hour' < $7 AND $8 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
+                    "(servicio_pedido_es_por_hora = true AND $9 AND ($10 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
 
                 //obtenemos los valores para asignar
                 const values = [
@@ -517,14 +511,10 @@ class Usuario_controller {
                     es_por_hora,
                     parseInt(servicio_horas),
                     servicio_pedido_fecha,
-                    servicio_pedido_fecha,
                     es_por_hora,
                     parseInt(servicio_horas),
                     servicio_pedido_fecha,
                     servicio_pedido_fecha, !es_por_hora,
-                    servicio_pedido_fecha,
-                    servicio_pedido_fecha, !es_por_hora,
-                    servicio_pedido_fecha,
                     servicio_pedido_fecha
                 ]
 
