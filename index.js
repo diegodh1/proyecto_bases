@@ -124,6 +124,10 @@ app.post('/pedir_servicio', usuario_routes.pedir_servicio);
 app.post('/pagar_servicio', usuario_routes.pagar_servicio);
 // este metodo nos permite cambiar directamente el estado_servicio_id directamente a un servicio pedido
 app.post('/modificar_estado_servicio', usuario_routes.modificar_estado_servicio);
+// este metodo nos permite recargar la cuenta de un usuario
+app.post('/cuenta_recargar', usuario_routes.cuenta_recargar);
+// este metodo nos permite dar la puntuacion a un servicio
+app.post('/puntuacion_dar', usuario_routes.puntuacion_dar);
 // este metodo me permite filtrar la lista de ocupacion
 app.post('/filtro_ocupacion', ocupacion_routes.filtro_ocupacion);
 

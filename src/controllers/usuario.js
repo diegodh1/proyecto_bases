@@ -68,6 +68,12 @@ class Usuario_controller {
                 return response;
             }
 
+            let cuenta = await this.crear_cuenta(usuario.get_usuario_id());
+
+            if (cuenta.status !== 200) {
+                return cuenta;
+            }
+
             return response;
         } catch (e) {
             return {
@@ -76,6 +82,170 @@ class Usuario_controller {
                     nombre: '',
                     apellido: ''
                 },
+                status: 500,
+                message: 'error interno del servidor'
+            };
+        }
+    }
+
+    //METODO QUE PERMITE CREAR LA Cuenta de un Usuario NUEVO EN LA BASE DE DATOS
+    async crear_cuenta(id) {
+        try {
+
+            //realizamos la consulta
+            const sql = "INSERT INTO cuenta(usuario_id, cuenta_saldo) " +
+                "VALUES($1, $2) RETURNING usuario_id";
+            //obtenemos los valores para asignar 
+            const values = [
+                id,
+                0
+            ]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+
+                            return {
+                                status: 200,
+                                message: 'Cuenta creado con éxito'
+                            };
+                        })
+                        .catch(err => {
+                            client.release();
+
+                            return {
+                                status: 400,
+                                message: err.detail
+                            };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            }
+
+            return response;
+        } catch (e) {
+            return {
+                status: 500,
+                message: 'error interno del servidor'
+            };
+        }
+    }
+
+    //METODO QUE PERMITE recargar LA Cuenta de un Usuario EN LA BASE DE DATOS
+    async recargar_cuenta(id, recarga) {
+        try {
+
+            //creamos el usuario
+            usuario = new Usuario(id, "", "", 1, "", 1, 1, "", "", "", "", true);
+
+            //realizamos la consulta
+            const sql = "UPDATE cuenta SET cuenta_saldo = $1 + cuenta.cuenta_saldo WHERE usuario_id = $2 ";
+            //obtenemos los valores para asignar 
+            const values = [
+                parseFloat(recarga),
+                usuario.get_usuario_id()
+            ]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+
+                            return {
+                                id_usuario: usuario.get_usuario_id(),
+                                status: 200,
+                                message: 'Cuenta recargada con éxito'
+                            };
+                        })
+                        .catch(err => {
+                            client.release();
+
+                            return {
+                                id_usuario: usuario.get_usuario_id(),
+                                status: 400,
+                                message: err.detail
+                            };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            }
+
+            return response;
+        } catch (e) {
+            return {
+                status: 500,
+                message: 'error interno del servidor'
+            };
+        }
+    }
+
+    //METODO QUE PERMITE dar una puntuacion a un servicio
+    async dar_puntuacion(servicio_nro, calificacion, puntuacion_fecha) {
+        try {
+
+
+            //realizamos la consulta
+            const sql = "INSERT INTO puntuacion(servicio_nro, puntuacion_calificacion, puntuacion_fecha) " +
+                "VALUES($1, $2, $3) RETURNING servicio_nro, puntuacion_calificacion";
+            //obtenemos los valores para asignar 
+            const values = [
+                parseInt(servicio_nro),
+                parseFloat(calificacion),
+                puntuacion_fecha
+            ]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+
+                            return {
+                                puntacion: { servicio: servicio_nro, puntos: calificacion },
+                                status: 200,
+                                message: 'Calificacion asignada correctamente'
+                            };
+                        })
+                        .catch(err => {
+                            client.release();
+
+                            return {
+                                puntuacion: {},
+                                status: 400,
+                                message: err.detail
+                            };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            }
+
+            return response;
+        } catch (e) {
+            return {
                 status: 500,
                 message: 'error interno del servidor'
             };
@@ -366,7 +536,6 @@ class Usuario_controller {
         if (pagado.status !== 200 || pagado_aceptado.status !== 200) {
             return pagado.message;
         } else {
-            console.log("entro por aca");
 
             try {
 

@@ -79,6 +79,65 @@ exports.pedir_servicio = async(req, res) => {
 
 };
 
+// metodo para poder recargar la cuenta de un usuario
+exports.cuenta_recargar = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    usuario_id = req.body.usuario_id;
+    recarga = req.body.recarga;
+
+    usuario_controller = new Usuario_controller();
+    let data = usuario_controller.recargar_cuenta(usuario_id, recarga);
+
+    if (!Number(usuario_id) || !Number(recarga)) {
+        res.json({
+            message: 'El id y la recarga deben ser datos númericos',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+
+
+};
+
+// metodo para poder dar la puntuacion a un servicio
+exports.puntuacion_dar = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    servicio_nro = req.body.servicio_nro;
+    calificacion = req.body.calificacion;
+    puntuacion_fecha = req.body.puntuacion_fecha;
+
+    usuario_controller = new Usuario_controller();
+    let data = usuario_controller.dar_puntuacion(servicio_nro, calificacion, puntuacion_fecha);
+
+    if (!Number(servicio_nro) || !Number(calificacion)) {
+        res.json({
+            message: 'El id y la calificacion deben ser datos númericos',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+
+
+};
+
 // metodo para poder pagar un servicio
 exports.pagar_servicio = async(req, res) => {
     //obtenemos los campos de la solicitud
