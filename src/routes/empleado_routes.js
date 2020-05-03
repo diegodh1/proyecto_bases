@@ -191,7 +191,7 @@ exports.servicio_update = (req, res) => {
 }
 
 // metodo que permite obtener la informacion de un empleado
-exports.informacion_empleado = async(req, res) => {
+exports.empleado_informacion = async(req, res) => {
 
     //obtenemos los campos de la solicitud
     servicio_nro = req.body.servicio_nro;
@@ -199,9 +199,9 @@ exports.informacion_empleado = async(req, res) => {
     empleado_controller = new Empleado_controller();
     const data = empleado_controller.empleado_informacion(servicio_nro);
 
-    if (!Number(id_usuario)) {
+    if (!Number(servicio_nro)) {
         res.json({
-            message: 'La cédula debe ser tipo numérico y la contraseña no puede ser vacía',
+            message: 'el id del servicio es numérico',
             status: 400
         });
     } else {

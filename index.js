@@ -113,7 +113,7 @@ app.post('/servicio_update', empleado_routes.servicio_update);
 // este metodo me permite agregar servicios a un trabajador
 app.post('/agregar_servicios_empleado', empleado_routes.agregar_servicios_empleado);
 // este metodo me permite obtener toda la informacion de un empleado
-app.post('/informacion_empleado', empleado_routes.informacion_empleado);
+app.post('/empleado_informacion', empleado_routes.empleado_informacion);
 // metodo para loguear el usuario a la apliacion
 app.post('/login_usuario', usuario_routes.login_usuario);
 // este metodo me permite crear un usuario en la base de datos
