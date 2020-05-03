@@ -46,7 +46,6 @@ exports.pedir_servicio = async(req, res) => {
     //obtenemos los campos de la solicitud
     usuario_id = req.body.usuario_id;
     servicio_nro = req.body.servicio_nro;
-    estado_servicio_id = req.body.estado_servicio_id;
     servicio_pedido_fecha = req.body.servicio_pedido_fecha;
     descripcion = req.body.descripcion;
     servicio_horas = req.body.servicio_horas;
@@ -55,7 +54,7 @@ exports.pedir_servicio = async(req, res) => {
 
     usuario_controller = new Usuario_controller();
     let data = usuario_controller.servicio_verificar_estado(servicio_nro, servicio_pedido_fecha, descripcion,
-        servicio_horas, servicio_unidad_labor, es_por_hora, usuario_id, estado_servicio_id);
+        servicio_horas, servicio_unidad_labor, es_por_hora, usuario_id);
 
     if (!Number(servicio_horas) || !Number(servicio_unidad_labor)) {
         res.json({

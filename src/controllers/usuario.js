@@ -313,13 +313,13 @@ class Usuario_controller {
     }
 
     //METODO QUE PERMITE PEDIR un servicio en la base
-    async servicio_pedir(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id) {
+    async servicio_pedir(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id) {
         try {
             //creamos el usuario
             usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', 1, true);
             //realizamos la consulta
-            const sql = 'INSERT INTO servicio_pedido(servicio_nro, servicio_pedido_fecha, servicio_pedido_descripcion, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora, usuario_id, estado_servicio_id)' +
-                'VALUES($1, $2, $3, $4, $5, $6, $7, $8)';
+            const sql = "INSERT INTO servicio_pedido(servicio_nro, servicio_pedido_fecha, servicio_pedido_descripcion, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora, usuario_id, estado_servicio_id)" +
+                "VALUES($1, $2, $3, $4, $5, $6, $7, $8)";
             //obtenemos los valores para asignar
             const values = [
                 parseInt(servicio_nro),
@@ -329,7 +329,7 @@ class Usuario_controller {
                 parseFloat(servicio_unidad_labor),
                 es_por_hora,
                 usuario.get_usuario_id(),
-                estado_servicio_id
+                'PENDIENTE'
             ]
 
             // realizamos la consulta
@@ -363,7 +363,7 @@ class Usuario_controller {
     }
 
     //METODO QUE PERMITE VERIFICAR un servicio en la base respecto a su estado y ocupacion solicitada
-    async servicio_verificar_estado(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id) {
+    async servicio_verificar_estado(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id) {
         try {
             //creamos el usuario
             usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', 1, true);
@@ -406,18 +406,18 @@ class Usuario_controller {
                 }
 
                 return this.servicio_verificar_fecha(servicio_nro, servicio_pedido_fecha,
-                    descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id);
+                    descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id);
             }
 
             return this.servicio_verificar_fecha(servicio_nro, servicio_pedido_fecha,
-                descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id);
+                descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id);
         } catch (e) {
             return { ocupacion_id: '', status: 500, message: 'error interno del servidor' };
         }
     }
 
     //METODO QUE PERMITE VERIFICAR un servicio en la base respecto a su fecha solicitada
-    async servicio_verificar_fecha(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id) {
+    async servicio_verificar_fecha(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id) {
         try {
             //realizamos la consulta
             const sql = "SELECT servicio_pedido_id FROM " +
@@ -475,7 +475,7 @@ class Usuario_controller {
             }
 
             return this.servicio_pedir(servicio_nro, servicio_pedido_fecha,
-                descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id, estado_servicio_id);
+                descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id);
 
         } catch (e) {
             return {
