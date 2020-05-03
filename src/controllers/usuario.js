@@ -431,18 +431,18 @@ class Usuario_controller {
             //obtenemos los valores para asignar
             const values = [
                 usuario.get_usuario_id(),
-                es_por_hora == 'true',
-                "" + servicio_horas,
+                es_por_hora,
+                parseInt(servicio_horas),
                 servicio_pedido_fecha,
                 servicio_pedido_fecha,
-                es_por_hora == 'true',
-                "" + servicio_horas,
+                es_por_hora,
+                parseInt(servicio_horas),
                 servicio_pedido_fecha,
                 servicio_pedido_fecha,
-                es_por_hora == 'false',
+                !es_por_hora,
                 servicio_pedido_fecha,
                 servicio_pedido_fecha,
-                es_por_hora == 'false',
+                !es_por_hora,
                 servicio_pedido_fecha,
                 servicio_pedido_fecha
             ]
