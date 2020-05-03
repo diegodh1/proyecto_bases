@@ -487,17 +487,14 @@ class Usuario_controller {
     //METODO QUE PERMITE VERIFICAR un servicio en la base respecto a su fecha solicitada
     async servicio_verificar_fecha_otros(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id) {
 
-        let cedula = await this.dar_ocupacion_servicio_cedula(servicio_nro);
-        if (parseInt(cedula) == -1) {
-            return {
-                ocupacion_id: '',
-                status: 400,
-                message: 'No se encontro al trabajador para realizar el pedido'
-            };
+        let cedula_respuesta = await this.dar_ocupacion_servicio_cedula(servicio_nro);
+        if (cedula_respuesta.status !== 200) {
+            return cedula_respuesta;
         } else {
 
             try {
 
+                let cedula = cedula_respuesta.trabajador.trabajador_cedula;
                 //realizamos la consulta
                 const sql = "SELECT servicio_pedido_id FROM " +
                     "(SELECT servicio_nro, trabajador_cedula FROM servicio WHERE trabajador_cedula = $1) AS procesado_final NATURAL JOIN " +
@@ -580,19 +577,18 @@ class Usuario_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return res.rows[0].trabajador_cedula;
-
+                            return { trabajador: res.rows[0], status: 200, message: 'Se encontro al trabajador para realizar el pedido' };
                         })
                         .catch(err => {
                             client.release();
-                            return -1;
+                            return { trabajador: {}, status: 400, message: 'No se encontro al trabajador para realizar el pedido' };
                         })
                 });
 
             // resolvemos la promesa
             let response = await data;
-            if (response == -1) {
-                return -1;
+            if (response !== 200) {
+                return response;
             }
 
             return response;
