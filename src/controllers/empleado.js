@@ -300,20 +300,22 @@ class Empleado_controller {
                     "(SELECT servicio_nro, servicio_pedido_id, servicio_pedido_fecha, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE " +
                     "estado_servicio_id = 'ACEPTADO' OR estado_servicio_id = 'OCUPADO') AS procesados NATURAL JOIN " +
                     "(SELECT servicio_nro, trabajador_cedula FROM servicio WHERE trabajador_cedula = $1 ) AS procesado_cedula " +
-                    "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4 )) OR " +
-                    "(servicio_pedido_es_por_hora = true AND $5 AND (servicio_pedido_fecha - $6 * INTERVAL '1 hour' < $7 AND $8 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
-                    "(servicio_pedido_es_por_hora = true AND $9 AND ($10 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
+                    "WHERE (servicio_pedido_es_por_hora = false AND $2 AND (servicio_pedido_fecha > $3 AND servicio_pedido_fecha - $4 * INTERVAL '1 hour' < $5 )) OR " +
+                    "(servicio_pedido_es_por_hora = true AND $6 AND (servicio_pedido_fecha - $7 * INTERVAL '1 hour' < $8 AND $9 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL '1 hour')) OR " +
+                    "(servicio_pedido_es_por_hora = true AND $10 AND (servicio_pedido_fecha < $11 AND $12::timestamptz - servicio_pedido_horas * INTERVAL '1 hour' < servicio_pedido_fecha))";
 
-                //obtenemos los valores para asignar
+                //obtenemos los valores para asignar // 2:50 < 3:10 + 4 horas 
                 const values = [
                     parseInt(cedula),
                     es_por_hora,
+                    fecha + '',
                     parseInt(servicio_horas),
                     fecha + '',
                     es_por_hora,
                     parseInt(servicio_horas),
                     fecha + '',
                     fecha + '', !es_por_hora,
+                    fecha + '',
                     fecha + ''
                 ]
 
