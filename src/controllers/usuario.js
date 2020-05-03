@@ -594,7 +594,7 @@ class Usuario_controller {
             return response;
         } catch (e) {
             return {
-                ocupacion_id: '',
+                cedula: '',
                 status: 500,
                 message: 'Error interno del servidor'
             };

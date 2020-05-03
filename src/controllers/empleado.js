@@ -280,6 +280,168 @@ class Empleado_controller {
 
     }
 
+    //METODO QUE PERMITE VERIFICAR el aceptar un servicio respecto a su fecha para realizar
+    async aceptar_verificar_fecha(servicio_pedido_id, servicio_aceptado_fecha) {
+        let fecha_aceptar = await this.dar_fecha_servicio(servicio_pedido_id);
+        let cedula_aceptar = await this.dar_ocupacion_servicio_cedula(servicio_pedido_id);
+        if (fecha_aceptar.status !== 200 || cedula_aceptar.status !== 200) {
+            return fecha_aceptar;
+        } else {
+
+            try {
+                let es_por_hora = fecha_aceptar.info.servicio_pedido_es_por_hora;
+                let servicio_horas = fecha_aceptar.info.servicio_pedido_horas;
+                let fecha = fecha_aceptar.info.servicio_pedido_fecha;
+                let cedula = cedula_aceptar.info.trabajador_cedula;
+                es_por_hora === 'true' ? es_por_hora = true : es_por_hora;
+                es_por_hora === 'false' ? es_por_hora = false : es_por_hora;
+                //realizamos la consulta
+                const sql = "SELECT servicio_pedido_id FROM " +
+                    "(SELECT servicio_nro, servicio_pedido_id, servicio_pedido_fecha, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE " +
+                    "estado_servicio_id = 'ACEPTADO' OR estado_servicio_id = 'OCUPADO') AS procesados NATURAL JOIN " +
+                    "(SELECT servicio_nro, trabajador_cedula FROM servicio WHERE trabajador_cedula = $1 ) AS procesado_cedula " +
+                    "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4 )) OR " +
+                    "(servicio_pedido_es_por_hora = true AND $5 AND (servicio_pedido_fecha - $6 * INTERVAL '1 hour' < $7 AND $8 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
+                    "(servicio_pedido_es_por_hora = true AND $9 AND ($10 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
+
+                //obtenemos los valores para asignar
+                const values = [
+                    parseInt(cedula),
+                    es_por_hora,
+                    parseInt(servicio_horas),
+                    fecha + '',
+                    es_por_hora,
+                    parseInt(servicio_horas),
+                    fecha + '',
+                    fecha + '', !es_por_hora,
+                    fecha + ''
+                ]
+
+                // realizamos la consulta
+                let data = pool
+                    .connect()
+                    .then(client => {
+                        return client
+                            .query(sql, values)
+                            .then(res => {
+                                client.release();
+                                return res.rows;
+
+                            })
+                            .catch(err => {
+                                client.release();
+                                return [];
+                            })
+                    });
+
+                // resolvemos la promesa
+                let response = await data;
+                if (response.length > 0) {
+                    return {
+                        ocupacion_id: '',
+                        status: 400,
+                        message: 'No se puede aceptar otro pedido en un horario ocupado'
+                    };
+                }
+
+                return this.servicio_aceptar(servicio_pedido_id, servicio_aceptado_fecha);
+
+            } catch (e) {
+                return {
+                    ocupacion_id: '',
+                    status: 500,
+                    message: 'Error interno del servidor'
+                };
+            }
+
+        }
+
+    }
+
+
+    //METODO QUE retorna la cedula del trabajador de un servicio
+    async dar_ocupacion_servicio_cedula(servicio_pedido_id) {
+        try {
+            //realizamos la consulta
+            const sql = "SELECT trabajador_cedula FROM servicio NATURAL JOIN " +
+                "(SELECT servicio_nro FROM servicio_pedido WHERE servicio_pedido_id = $1) AS procesado";
+            //obtenemos los valores para asignar
+            const values = [parseInt(servicio_pedido_id)]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { info: res.rows[0], status: 200, message: "Se encontro al trabajador del servicio" };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { info: res.rows[0], status: 400, message: "No se encontro la informacion para aceptar el trabajo" };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            }
+
+            return response;
+        } catch (e) {
+            return {
+                cedula: '',
+                status: 500,
+                message: 'Error interno del servidor'
+            };
+        }
+    }
+
+    //METODO QUE retorna la fecha del servicio que solicitaron
+    async dar_fecha_servicio(servicio_pedido_id) {
+        try {
+            //realizamos la consulta
+            const sql = "SELECT servicio_pedido_fecha::VARCHAR, servicio_pedido_horas, servicio_pedido_es_por_hora FROM servicio_pedido WHERE servicio_pedido_id = $1 ";
+            //obtenemos los valores para asignar
+            const values = [parseInt(servicio_pedido_id)]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { info: res.rows[0], status: 200, message: "Se encontro la fecha del trabajo a aceptar" };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { info: {}, status: 400, message: "No se encontro la informacion para aceptar el trabajo" };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            }
+
+            return response;
+        } catch (e) {
+            return {
+                fecha: '',
+                status: 500,
+                message: 'Error interno del servidor'
+            };
+        }
+    }
+
 
     //METODO QUE ACTUALIZAR EL ESTADO_SERVICIO_ID 
     async update_servicio(servicio_pedido_id, estado_servicio_id) {
@@ -413,11 +575,11 @@ class Empleado_controller {
         try {
             empleado = new Empleado(-1, '', '', 1, '', 1, 1, '', '', '', true, '', '');
             //realizamos la consulta
-            const sql = "SELECT tr.trabajador_cedula, (tr.trabajador_nombre||' '||tr.trabajador_apellido) as trabajador_nombre, tr.trabajador_direccion,"+
-            "tr.trabajador_latitud, tr.trabajador_longitud, tr.trabajador_celular, tr.trabajador_foto_base64,"+
-            "(SELECT CASE WHEN AVG(puntuacion_calificacion) IS NULL THEN 0 ELSE  ROUND(AVG(puntuacion_calificacion)::numeric,1) END "+
-            "FROM puntuacion WHERE puntuacion.servicio_nro = servicio.servicio_nro) as puntuacion FROM servicio NATURAL JOIN trabajador as tr "+
-            "WHERE servicio_nro = $1";
+            const sql = "SELECT tr.trabajador_cedula, (tr.trabajador_nombre||' '||tr.trabajador_apellido) as trabajador_nombre, tr.trabajador_direccion," +
+                "tr.trabajador_latitud, tr.trabajador_longitud, tr.trabajador_celular, tr.trabajador_foto_base64," +
+                "(SELECT CASE WHEN AVG(puntuacion_calificacion) IS NULL THEN 0 ELSE  ROUND(AVG(puntuacion_calificacion)::numeric,1) END " +
+                "FROM puntuacion WHERE puntuacion.servicio_nro = servicio.servicio_nro) as puntuacion FROM servicio NATURAL JOIN trabajador as tr " +
+                "WHERE servicio_nro = $1";
 
             //obtenemos los valores para asignar
             const values = [parseInt(servicio_nro)]
@@ -429,12 +591,12 @@ class Empleado_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return {trabajador: res.rows[0], status:200, message: 'operación realizada'};
+                            return { trabajador: res.rows[0], status: 200, message: 'operación realizada' };
 
                         })
                         .catch(err => {
                             client.release();
-                            return {trabajador:{}, status:400, message: 'No se pudo encontrar la información'};
+                            return { trabajador: {}, status: 400, message: 'No se pudo encontrar la información' };
                         })
                 });
 
@@ -449,7 +611,7 @@ class Empleado_controller {
             }
 
         } catch (e) {
-            return {trabajador: {}, status:500, message: 'error interno del servidor'};
+            return { trabajador: {}, status: 500, message: 'error interno del servidor' };
         }
     }
 

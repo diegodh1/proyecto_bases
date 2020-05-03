@@ -141,7 +141,7 @@ exports.aceptar_servicio = async(req, res) => {
     servicio_aceptado_fecha = req.body.servicio_aceptado_fecha;
 
     empleado_controller = new Empleado_controller();
-    const data = empleado_controller.servicio_aceptar(servicio_pedido_id, servicio_aceptado_fecha);
+    const data = empleado_controller.aceptar_verificar_fecha(servicio_pedido_id, servicio_aceptado_fecha);
 
 
     if (!Number(servicio_pedido_id)) {
