@@ -394,7 +394,7 @@ class Usuario_controller {
             // resolvemos la promesa
             let response = await data;
             if (response.length > 0) {
-                let ocupacion_actual = await this.dar_ocupacion_servicio(servicio_nro).ocupacion_id;
+                let ocupacion_actual = await this.dar_ocupacion_servicio(servicio_nro);
                 for (let i = 0; i < response.length; i++) {
                     if (ocupacion_actual === response[i].ocupacion_id) {
                         return {
@@ -419,6 +419,8 @@ class Usuario_controller {
     //METODO QUE PERMITE VERIFICAR un servicio en la base respecto a su fecha solicitada
     async servicio_verificar_fecha(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id) {
         try {
+            es_por_hora === 'true' ? es_por_hora = true : es_por_hora;
+            es_por_hora === 'false' ? es_por_hora = false : es_por_hora;
             //realizamos la consulta
             const sql = "SELECT servicio_pedido_id FROM " +
                 "(SELECT servicio_pedido_id, servicio_pedido_fecha, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE " +
@@ -438,11 +440,9 @@ class Usuario_controller {
                 es_por_hora,
                 parseInt(servicio_horas),
                 servicio_pedido_fecha,
+                servicio_pedido_fecha, !es_por_hora,
                 servicio_pedido_fecha,
-                !es_por_hora,
-                servicio_pedido_fecha,
-                servicio_pedido_fecha,
-                !es_por_hora,
+                servicio_pedido_fecha, !es_por_hora,
                 servicio_pedido_fecha,
                 servicio_pedido_fecha
             ]
@@ -486,10 +486,11 @@ class Usuario_controller {
         }
     }
 
+
     //METODO QUE PERMITE VERIFICAR un servicio en la base respecto a su fecha solicitada
     async servicio_verificar_fecha_otros(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id) {
 
-        let cedula = await this.dar_ocupacion_servicio(servicio_nro).trabajador_cedula;
+        let cedula = await this.dar_ocupacion_servicio_cedula(servicio_nro);
         if (parseInt(cedula) == -1) {
             return {
                 ocupacion_id: '',
@@ -499,31 +500,30 @@ class Usuario_controller {
         } else {
 
             try {
+
                 //realizamos la consulta
                 const sql = "SELECT servicio_pedido_id FROM " +
-                    "(SELECT servicio_nro, trabajador_cedula FROM servicio WHERE trabajador_cedula = $1) AS procesado_final NATURAL JOIN "
-                "(SELECT servicio_nro, servicio_pedido_id, servicio_pedido_fecha, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE " +
-                "estado_servicio_id = 'PENDIENTE' OR estado_servicio_id = 'ACEPTADO' OR estado_servicio_id = 'OCUPADO') AS procesados " +
-                "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4 AND $5 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
-                "(servicio_pedido_es_por_hora = true AND $6 AND (servicio_pedido_fecha - $7 * INTERVAL '1 hour' < $8 AND $9 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
-                "(servicio_pedido_es_por_hora = false AND $10 AND ( servicio_pedido_fecha - INTERVAL '3 hour' < $11 AND $12 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
-                "(servicio_pedido_es_por_hora = true AND $13 AND (servicio_pedido_fecha - INTERVAL '3 hour' < $14 AND $15 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
+                    "(SELECT servicio_nro, trabajador_cedula FROM servicio WHERE trabajador_cedula = $1) AS procesado_final NATURAL JOIN " +
+                    "(SELECT servicio_nro, servicio_pedido_id, servicio_pedido_fecha, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE " +
+                    "estado_servicio_id = 'ACEPTADO' OR estado_servicio_id = 'OCUPADO') AS procesados " +
+                    "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4 AND $5 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
+                    "(servicio_pedido_es_por_hora = true AND $6 AND (servicio_pedido_fecha - $7 * INTERVAL '1 hour' < $8 AND $9 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
+                    "(servicio_pedido_es_por_hora = false AND $10 AND ( servicio_pedido_fecha - INTERVAL '3 hour' < $11 AND $12 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
+                    "(servicio_pedido_es_por_hora = true AND $13 AND (servicio_pedido_fecha - INTERVAL '3 hour' < $14 AND $15 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
 
                 //obtenemos los valores para asignar
                 const values = [
                     parseInt(cedula),
-                    es_por_hora == 'true',
-                    "" + servicio_horas,
+                    es_por_hora,
+                    parseInt(servicio_horas),
                     servicio_pedido_fecha,
                     servicio_pedido_fecha,
-                    es_por_hora == 'true',
-                    "" + servicio_horas,
+                    es_por_hora,
+                    parseInt(servicio_horas),
                     servicio_pedido_fecha,
+                    servicio_pedido_fecha, !es_por_hora,
                     servicio_pedido_fecha,
-                    es_por_hora == 'false',
-                    servicio_pedido_fecha,
-                    servicio_pedido_fecha,
-                    es_por_hora == 'false',
+                    servicio_pedido_fecha, !es_por_hora,
                     servicio_pedido_fecha,
                     servicio_pedido_fecha
                 ]
@@ -570,12 +570,11 @@ class Usuario_controller {
 
     }
 
-
-    //METODO QUE retorna la ocupacion_id y la cedula del trabajador de un servicio
-    async dar_ocupacion_servicio(servicio_nro) {
+    //METODO QUE retorna la cedula del trabajador de un servicio
+    async dar_ocupacion_servicio_cedula(servicio_nro) {
         try {
             //realizamos la consulta
-            const sql = 'SELECT ocupacion_id, trabajador_cedula FROM servicio WHERE servicio_nro = $1';
+            const sql = 'SELECT trabajador_cedula FROM servicio WHERE servicio_nro = $1';
             //obtenemos los valores para asignar
             const values = [parseInt(servicio_nro)]
 
@@ -587,18 +586,59 @@ class Usuario_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return res.rows[0];
+                            return res.rows[0].trabajador_cedula;
 
                         })
                         .catch(err => {
                             client.release();
-                            return { ocupacion_id: 'NO ENCONTRADO', trabajador_cedula: -1 };
+                            return -1;
                         })
                 });
 
             // resolvemos la promesa
             let response = await data;
-            if (response.ocupacion_id === 'NO ENCONTRADO') {
+            if (response == -1) {
+                return -1;
+            }
+
+            return response;
+        } catch (e) {
+            return {
+                ocupacion_id: '',
+                status: 500,
+                message: 'Error interno del servidor'
+            };
+        }
+    }
+
+    //METODO QUE retorna la ocupacion_id de un servicio
+    async dar_ocupacion_servicio(servicio_nro) {
+        try {
+            //realizamos la consulta
+            const sql = 'SELECT ocupacion_id FROM servicio WHERE servicio_nro = $1';
+            //obtenemos los valores para asignar
+            const values = [parseInt(servicio_nro)]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return res.rows[0].ocupacion_id;
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return 'NO ENCONTRADO';
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response === 'NO ENCONTRADO') {
                 return 'NO ENCONTRADO';
             }
 
