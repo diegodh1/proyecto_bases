@@ -56,7 +56,7 @@ exports.pedir_servicio = async(req, res) => {
     let data = usuario_controller.servicio_verificar_estado(servicio_nro, servicio_pedido_fecha, descripcion,
         servicio_horas, servicio_unidad_labor, es_por_hora, usuario_id);
 
-    if (!Number(servicio_horas) || !Number(servicio_unidad_labor)) {
+    if (!Number(servicio_nro) || !Number(usuario_id) || !Number(servicio_horas) || !Number(servicio_unidad_labor)) {
         res.json({
             message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
             status: 400

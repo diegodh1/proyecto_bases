@@ -394,7 +394,7 @@ class Usuario_controller {
             // resolvemos la promesa
             let response = await data;
             if (response.length > 0) {
-                let ocupacion_actual = await this.dar_ocupacion_servicio(servicio_nro);
+                let ocupacion_actual = await this.dar_ocupacion_servicio(servicio_nro).ocupacion_id;
                 for (let i = 0; i < response.length; i++) {
                     if (ocupacion_actual === response[i].ocupacion_id) {
                         return {
@@ -474,7 +474,7 @@ class Usuario_controller {
                 };
             }
 
-            return this.servicio_pedir(servicio_nro, servicio_pedido_fecha,
+            return this.servicio_verificar_fecha_otros(servicio_nro, servicio_pedido_fecha,
                 descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id);
 
         } catch (e) {
@@ -486,11 +486,96 @@ class Usuario_controller {
         }
     }
 
-    //METODO QUE retorna la ocupacion_id de un servicio
+    //METODO QUE PERMITE VERIFICAR un servicio en la base respecto a su fecha solicitada
+    async servicio_verificar_fecha_otros(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id) {
+
+        let cedula = await this.dar_ocupacion_servicio(servicio_nro).trabajador_cedula;
+        if (parseInt(cedula) == -1) {
+            return {
+                ocupacion_id: '',
+                status: 400,
+                message: 'No se encontro al trabajador para realizar el pedido'
+            };
+        } else {
+
+            try {
+                //realizamos la consulta
+                const sql = "SELECT servicio_pedido_id FROM " +
+                    "(SELECT servicio_nro, trabajador_cedula FROM servicio WHERE trabajador_cedula = $1) AS procesado_final NATURAL JOIN "
+                "(SELECT servicio_nro, servicio_pedido_id, servicio_pedido_fecha, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE " +
+                "estado_servicio_id = 'PENDIENTE' OR estado_servicio_id = 'ACEPTADO' OR estado_servicio_id = 'OCUPADO') AS procesados " +
+                "WHERE (servicio_pedido_es_por_hora = false AND $2 AND ( servicio_pedido_fecha - $3 * INTERVAL '1 hour' < $4 AND $5 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
+                "(servicio_pedido_es_por_hora = true AND $6 AND (servicio_pedido_fecha - $7 * INTERVAL '1 hour' < $8 AND $9 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour')) OR " +
+                "(servicio_pedido_es_por_hora = false AND $10 AND ( servicio_pedido_fecha - INTERVAL '3 hour' < $11 AND $12 < servicio_pedido_fecha + INTERVAL '3 hour')) OR " +
+                "(servicio_pedido_es_por_hora = true AND $13 AND (servicio_pedido_fecha - INTERVAL '3 hour' < $14 AND $15 < servicio_pedido_fecha + servicio_pedido_horas * INTERVAL'1 hour'))";
+
+                //obtenemos los valores para asignar
+                const values = [
+                    parseInt(cedula),
+                    es_por_hora == 'true',
+                    "" + servicio_horas,
+                    servicio_pedido_fecha,
+                    servicio_pedido_fecha,
+                    es_por_hora == 'true',
+                    "" + servicio_horas,
+                    servicio_pedido_fecha,
+                    servicio_pedido_fecha,
+                    es_por_hora == 'false',
+                    servicio_pedido_fecha,
+                    servicio_pedido_fecha,
+                    es_por_hora == 'false',
+                    servicio_pedido_fecha,
+                    servicio_pedido_fecha
+                ]
+
+                // realizamos la consulta
+                let data = pool
+                    .connect()
+                    .then(client => {
+                        return client
+                            .query(sql, values)
+                            .then(res => {
+                                client.release();
+                                return res.rows;
+
+                            })
+                            .catch(err => {
+                                client.release();
+                                return [];
+                            })
+                    });
+
+                // resolvemos la promesa
+                let response = await data;
+                if (response.length > 0) {
+                    return {
+                        ocupacion_id: '',
+                        status: 400,
+                        message: 'No se puede solicitar porque en este horario el trabajador esta ocupado'
+                    };
+                }
+
+                return this.servicio_pedir(servicio_nro, servicio_pedido_fecha,
+                    descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id);
+
+            } catch (e) {
+                return {
+                    ocupacion_id: '',
+                    status: 500,
+                    message: 'Error interno del servidor'
+                };
+            }
+
+        }
+
+    }
+
+
+    //METODO QUE retorna la ocupacion_id y la cedula del trabajador de un servicio
     async dar_ocupacion_servicio(servicio_nro) {
         try {
             //realizamos la consulta
-            const sql = 'SELECT ocupacion_id FROM servicio WHERE servicio_nro = $1';
+            const sql = 'SELECT ocupacion_id, trabajador_cedula FROM servicio WHERE servicio_nro = $1';
             //obtenemos los valores para asignar
             const values = [parseInt(servicio_nro)]
 
@@ -502,18 +587,18 @@ class Usuario_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return res.rows[0].ocupacion_id;
+                            return res.rows[0];
 
                         })
                         .catch(err => {
                             client.release();
-                            return 'NO ENCONTRADO';
+                            return { ocupacion_id: 'NO ENCONTRADO', trabajador_cedula: -1 };
                         })
                 });
 
             // resolvemos la promesa
             let response = await data;
-            if (response === 'NO ENCONTRADO') {
+            if (response.ocupacion_id === 'NO ENCONTRADO') {
                 return 'NO ENCONTRADO';
             }
 
