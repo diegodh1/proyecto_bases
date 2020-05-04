@@ -375,7 +375,7 @@ class Usuario_controller {
                 //realizamos la consulta
                 const sql = "SELECT servicio_precio_hora, servicio_precio_unidad_labor FROM servicio WHERE servicio_nro = $1";
                 //obtenemos los valores para asignar
-                const values = [usuario.get_usuario_id()]
+                const values = [parseInt(servicio_nro)]
 
                 // realizamos la consulta
                 let data = pool
@@ -700,7 +700,7 @@ class Usuario_controller {
     }
 
     //METODO QUE retorna el id del usuario que hizo un pedido
-    async dar_ocupacion_servicio(servicio_pedido_id) {
+    async dar_usuario_servicio(servicio_pedido_id) {
         try {
             //realizamos la consulta
             const sql = 'SELECT usuario_id FROM servicio_pedido WHERE servicio_pedido_id = $1';
