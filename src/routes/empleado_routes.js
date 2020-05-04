@@ -163,6 +163,34 @@ exports.aceptar_servicio = async(req, res) => {
 
 }
 
+//este metodo me permite obtener el reporte de un empleado
+exports.empleado_reporte = async(req, res) => {
+
+    trabajador_cedula = req.body.trabajador_cedula;
+
+    empleado_controller = new Empleado_controller();
+    const data = empleado_controller.reporte_empleado(trabajador_cedula);
+
+
+    if (!Number(trabajador_cedula)) {
+        res.json({
+            message: 'La cedula debe ser un numero',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+
+}
+
 exports.servicio_update = (req, res) => {
 
     servicio_pedido_id = req.body.servicio_pedido_id;

@@ -412,7 +412,7 @@ class Usuario_controller {
                 }
 
             } catch (e) {
-                return { ocupacion_id: '', status: 500, message: 'error interno del servidor' };
+                return { saldo: '', status: 500, message: 'error interno del servidor' };
             }
 
         }

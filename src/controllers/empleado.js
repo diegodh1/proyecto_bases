@@ -444,6 +444,70 @@ class Empleado_controller {
         }
     }
 
+    //METODO QUE el reporte de los servicios que presto un empleado
+    async reporte_empleado(trabajador_cedula) {
+        try {
+            //realizamos la consulta
+            const sql = "SELECT date_part('week', servicio_pedido_fecha::date) AS semana, ocupacion_id, COUNT(servicio_nro) AS cantidad  FROM servicio_aceptado NATURAL JOIN " +
+                "(SELECT * FROM (SELECT servicio_nro, ocupacion_id FROM servicio WHERE trabajador_cedula = $1) AS servicios NATURAL JOIN " +
+                "(SELECT servicio_nro, servicio_pedido_id, servicio_pedido_fecha FROM servicio_pedido WHERE CURRENT_TIMESTAMP - 1 * INTERVAL '1 month' <= servicio_pedido_fecha AND servicio_pedido_fecha <= CURRENT_TIMESTAMP) AS pedidos) AS hechos " +
+                "WHERE estado_servicio_id = 'FINALIZADO' " +
+                "GROUP BY semana, ocupacion_id " +
+                "ORDER BY semana";
+            //obtenemos los valores para asignar
+            const values = [parseInt(trabajador_cedula)]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return res.rows;
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return {};
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            let response_final = [];
+            if (response.length == 0) {
+                return {
+                    reporte: '',
+                    status: 400,
+                    message: 'Reporte no encontrado'
+                };
+            } else {
+
+                let semana_actual = 1;
+                let numero_semana = response[0].semana;
+                for (let i = 0; i < response.length; i++) {
+
+                    if (parseInt(numero_semana) !== parseInt(response[i].semana)) {
+                        semana_actual = semana_actual + (parseInt(response[i].semana) - parseInt(numero_semana));
+                        numero_semana = response[i].semana;
+                    }
+                    response_final.push({ semana: semana_actual, servicio: response[i].ocupacion_id, frecuencia: response[i].cantidad });
+                }
+
+                return { reporte: response_final, status: 200 };
+            }
+
+        } catch (e) {
+            return {
+                reporte: '',
+                status: 500,
+                message: 'Error interno del servidor'
+            };
+        }
+    }
+
 
     //METODO QUE ACTUALIZAR EL ESTADO_SERVICIO_ID 
     async update_servicio(servicio_pedido_id, estado_servicio_id) {
