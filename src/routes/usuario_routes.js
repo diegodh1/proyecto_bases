@@ -53,12 +53,12 @@ exports.pedir_servicio = async(req, res) => {
     es_por_hora = req.body.es_por_hora;
 
     usuario_controller = new Usuario_controller();
-    let data = usuario_controller.servicio_verificar_estado(servicio_nro, servicio_pedido_fecha, descripcion,
+    let data = usuario_controller.servicio_verificar_saldo(servicio_nro, servicio_pedido_fecha, descripcion,
         servicio_horas, servicio_unidad_labor, es_por_hora, usuario_id);
 
     if (!Number(servicio_nro) || !Number(usuario_id) || !Number(servicio_horas) || !Number(servicio_unidad_labor)) {
         res.json({
-            message: 'El id, el celular, la latitud y longitud deben ser datos númericos',
+            message: 'El id, el numero del servicio, las horas y la unidad labor deben ser datos númericos',
             status: 400
         });
     } else {

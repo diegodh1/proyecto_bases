@@ -362,6 +362,63 @@ class Usuario_controller {
         }
     }
 
+    //METODO QUE PERMITE VERIFICAR el saldo del usuario respecto al costo del servicio
+    async servicio_verificar_saldo(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id) {
+        //creamos el usuario
+        usuario = new Usuario(id, '', '', 1, '', 1, 1, '', '', '', 1, true);
+        let saldo_respuesta = await this.obtener_saldo(usuario.get_usuario_id());
+        if (saldo_respuesta.status !== 200) {
+            return saldo_respuesta;
+        } else {
+            try {
+
+                //realizamos la consulta
+                const sql = "SELECT servicio_precio_hora, servicio_precio_unidad_labor FROM servicio WHERE servicio_nro = $1";
+                //obtenemos los valores para asignar
+                const values = [usuario.get_usuario_id()]
+
+                // realizamos la consulta
+                let data = pool
+                    .connect()
+                    .then(client => {
+                        return client
+                            .query(sql, values)
+                            .then(res => {
+                                client.release();
+                                return { precios: res.rows[0], status: 200, message: "Precios encontrados" };
+
+                            })
+                            .catch(err => {
+                                client.release();
+                                return { precios: {}, status: 400, message: "Precios no encontrados" };
+                            })
+                    });
+
+                // resolvemos la promesa
+                let response = await data;
+                if (response.status !== 200) {
+                    return response;
+                } else {
+                    let saldo_string = saldo_respuesta.saldo_cuenta.cuenta_saldo;
+                    let saldo = parseFloat(saldo_string);
+
+                    if ((es_por_hora === 'true' && saldo < parseFloat(response.precios.servicio_precio_hora) * parseInt(servicio_horas)) ||
+                        (es_por_hora === 'false' && saldo < parseFloat(response.precios.servicio_precio_unidad_labor) * parseInt(servicio_unidad_labor))) {
+                        return { saldo_existente: saldo, status: 400, message: "No hay saldo suficiente para solicitar el servicio" };
+                    } else {
+                        return this.servicio_verificar_estado(servicio_nro, servicio_pedido_fecha,
+                            descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id);
+                    }
+                }
+
+            } catch (e) {
+                return { ocupacion_id: '', status: 500, message: 'error interno del servidor' };
+            }
+
+        }
+
+    }
+
     //METODO QUE PERMITE VERIFICAR un servicio en la base respecto a su estado y ocupacion solicitada
     async servicio_verificar_estado(servicio_nro, servicio_pedido_fecha, descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id) {
         try {
@@ -642,6 +699,47 @@ class Usuario_controller {
         }
     }
 
+    //METODO QUE retorna el id del usuario que hizo un pedido
+    async dar_ocupacion_servicio(servicio_pedido_id) {
+        try {
+            //realizamos la consulta
+            const sql = 'SELECT usuario_id FROM servicio_pedido WHERE servicio_pedido_id = $1';
+            //obtenemos los valores para asignar
+            const values = [parseInt(servicio_pedido_id)]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { id: res.rows[0], status: 200, message: "Usuario encontrado" };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { id: {}, status: 400, message: "Usuario no encontrado" };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response !== 200) {
+                return response;
+            }
+
+            return response;
+        } catch (e) {
+            return {
+                ocupacion_id: '',
+                status: 500,
+                message: 'Error interno del servidor'
+            };
+        }
+    }
+
 
     //METODO QUE PERMITE PAGAR un servicio en la base
     async servicio_pagar(servicio_pedido_id, pago_fecha, pago_valor) {
@@ -773,7 +871,42 @@ class Usuario_controller {
         }
     }
 
+    //METODO QUE PERMITE Actualizar un servicio_pedido
+    async obtener_saldo(id) {
+        try {
 
+            //realizamos la consulta
+            const sql = "SELECT cuenta_saldo FROM cuenta WHERE usuario_id = $1";
+            //obtenemos los valores para asignar
+            const values = [
+                id
+            ]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { saldo_cuenta: res.rows[0], status: 200, message: 'Saldo encontrado' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { saldo_cuenta: {}, status: 400, message: 'Saldo no encontrado' };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            return response;
+
+        } catch (e) {
+            return { saldo_cuenta: {}, status: 500, message: 'Error interno del servidor' };
+        }
+    }
 
 
 }
