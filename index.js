@@ -122,6 +122,10 @@ app.post('/login_usuario', usuario_routes.login_usuario);
 app.post('/crear_usuario', usuario_routes.crear_usuario);
 // este metodo nos permite crear el pedido de un servicio
 app.post('/pedir_servicio', usuario_routes.pedir_servicio);
+// este metodo nos permite ver los ultimos pedidos por el usuario
+app.post('/get_ultimos_servicios_pedidos', usuario_routes.get_ultimos_servicios_pedidos);
+// este metodo nos permite ver los ultimos aceptados por el usuario
+app.post('/get_ultimos_servicios_aceptados', usuario_routes.get_ultimos_servicios_aceptados);
 // este metodo nos permite crear el pago de un servicio
 app.post('/pagar_servicio', usuario_routes.pagar_servicio);
 // este metodo nos permite cambiar directamente el estado_servicio_id directamente a un servicio pedido

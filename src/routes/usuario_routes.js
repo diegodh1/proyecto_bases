@@ -103,8 +103,65 @@ exports.cuenta_recargar = async(req, res) => {
             });
         });
     }
+};
 
+// metodo para poder consultar los ultimos servicios pedidos
+exports.get_ultimos_servicios_pedidos = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    usuario_id = req.body.usuario_id;
+    estado_servicio_id = req.body.estado_servicio_id;
+    limite = req.body.limite;
 
+    usuario_controller = new Usuario_controller();
+    let data = usuario_controller.get_ultimos_servicios_pedidos(usuario_id, estado_servicio_id, limite);
+
+    if (!Number(usuario_id) || !Number(limite)) {
+        res.json({
+            message: 'El id del usuario y el límite deben ser numéricos',
+            status: 400,
+            servicios:[]
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500,
+                servicios:[]
+            });
+        });
+    }
+};
+
+// metodo para poder consultar los ultimos servicios aceptados por el usuario
+exports.get_ultimos_servicios_aceptados = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    usuario_id = req.body.usuario_id;
+    estado_servicio_id = req.body.estado_servicio_id;
+    limite = req.body.limite;
+
+    usuario_controller = new Usuario_controller();
+    let data = usuario_controller.get_ultimos_servicios_aceptados(usuario_id, estado_servicio_id, limite);
+
+    if (!Number(usuario_id) || !Number(limite)) {
+        res.json({
+            message: 'El id del usuario y el límite deben ser numéricos',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500,
+                message:'Error interno del servidor'
+            });
+        });
+    }
 };
 
 // metodo para poder dar la puntuacion a un servicio
