@@ -102,7 +102,7 @@ exports.empleados_cercanos = async(req, res) => {
 
     if (!Number(id_usuario)) {
         res.json({
-            message: 'La cédula debe ser tipo numérico y la contraseña no puede ser vacía',
+            message: 'El id del usuario debe de ser de tipo numerico',
             status: 400
         });
     } else {
@@ -146,7 +146,7 @@ exports.aceptar_servicio = async(req, res) => {
 
     if (!Number(servicio_pedido_id)) {
         res.json({
-            message: 'El servicio pedido debe ser un numero',
+            message: 'El id del servicio pedido debe ser un numero',
             status: 400
         });
     } else {
@@ -174,7 +174,7 @@ exports.empleado_reporte = async(req, res) => {
 
     if (!Number(trabajador_cedula)) {
         res.json({
-            message: 'La cedula debe ser un numero',
+            message: 'La cedula debe ser de tipo numerico',
             status: 400
         });
     } else {
@@ -201,7 +201,7 @@ exports.servicio_update = (req, res) => {
 
     if (!Number(servicio_pedido_id)) {
         res.json({
-            message: 'El servicio pedido debe ser un numero',
+            message: 'El id del servicio pedido debe ser un numero',
             status: 400
         });
     } else {
@@ -229,7 +229,7 @@ exports.empleado_informacion = async(req, res) => {
 
     if (!Number(servicio_nro)) {
         res.json({
-            message: 'el id del servicio es numérico',
+            message: 'El servicio para dar la informacion debe ser numérico',
             status: 400
         });
     } else {

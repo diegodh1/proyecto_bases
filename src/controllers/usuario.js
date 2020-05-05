@@ -83,7 +83,7 @@ class Usuario_controller {
                     apellido: ''
                 },
                 status: 500,
-                message: 'error interno del servidor'
+                message: 'Error interno del servidor'
             };
         }
     }
@@ -135,7 +135,7 @@ class Usuario_controller {
         } catch (e) {
             return {
                 status: 500,
-                message: 'error interno del servidor'
+                message: 'Error interno del servidor'
             };
         }
     }
@@ -176,7 +176,7 @@ class Usuario_controller {
                             return {
                                 id_usuario: usuario.get_usuario_id(),
                                 status: 400,
-                                message: err.detail
+                                message: 'Error al recargar la cuenta'
                             };
                         })
                 });
@@ -190,8 +190,9 @@ class Usuario_controller {
             return response;
         } catch (e) {
             return {
+                id_usuario: '',
                 status: 500,
-                message: 'error interno del servidor'
+                message: 'Error interno del servidor'
             };
         }
     }
@@ -232,7 +233,7 @@ class Usuario_controller {
                             return {
                                 puntuacion: {},
                                 status: 400,
-                                message: err.detail
+                                message: 'Error al asignar la calificacion'
                             };
                         })
                 });
@@ -246,8 +247,9 @@ class Usuario_controller {
             return response;
         } catch (e) {
             return {
+                puntuacion: {},
                 status: 500,
-                message: 'error interno del servidor'
+                message: 'Error interno del servidor'
             };
         }
     }
@@ -345,7 +347,7 @@ class Usuario_controller {
                         })
                         .catch(err => {
                             client.release();
-                            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 400, message: err.detail };
+                            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 400, message: 'Error al solicitar el servicio' };
                         })
                 });
 
@@ -358,7 +360,7 @@ class Usuario_controller {
             return response;
 
         } catch (e) {
-            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'error interno del servidor' };
+            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'Error interno del servidor' };
         }
     }
 
@@ -412,7 +414,7 @@ class Usuario_controller {
                 }
 
             } catch (e) {
-                return { saldo: '', status: 500, message: 'error interno del servidor' };
+                return { saldo_existente: '', status: 500, message: 'Error interno del servidor' };
             }
 
         }
@@ -469,7 +471,7 @@ class Usuario_controller {
             return this.servicio_verificar_fecha(servicio_nro, servicio_pedido_fecha,
                 descripcion, servicio_horas, servicio_unidad_labor, es_por_hora, id);
         } catch (e) {
-            return { ocupacion_id: '', status: 500, message: 'error interno del servidor' };
+            return { ocupacion_id: '', status: 500, message: 'Error interno del servidor' };
         }
     }
 
@@ -522,7 +524,7 @@ class Usuario_controller {
             let response = await data;
             if (response.length > 0) {
                 return {
-                    ocupacion_id: '',
+                    fecha: '',
                     status: 400,
                     message: 'No se puede solicitar otro pedido en horario de otro ya solicitado'
                 };
@@ -533,7 +535,7 @@ class Usuario_controller {
 
         } catch (e) {
             return {
-                ocupacion_id: '',
+                fecha: '',
                 status: 500,
                 message: 'Error interno del servidor'
             };
@@ -657,7 +659,7 @@ class Usuario_controller {
                 let response = await data;
                 if (response.length > 0) {
                     return {
-                        ocupacion_id: '',
+                        fecha_otros: '',
                         status: 400,
                         message: 'No se puede solicitar porque en este horario el trabajador esta ocupado'
                     };
@@ -668,7 +670,7 @@ class Usuario_controller {
 
             } catch (e) {
                 return {
-                    ocupacion_id: '',
+                    fecha_otros: '',
                     status: 500,
                     message: 'Error interno del servidor'
                 };
@@ -711,7 +713,7 @@ class Usuario_controller {
             return response;
         } catch (e) {
             return {
-                cedula: '',
+                trabajador: {},
                 status: 500,
                 message: 'Error interno del servidor'
             };
@@ -793,7 +795,7 @@ class Usuario_controller {
             return response;
         } catch (e) {
             return {
-                ocupacion_id: '',
+                id: {},
                 status: 500,
                 message: 'Error interno del servidor'
             };
@@ -835,7 +837,7 @@ class Usuario_controller {
                             })
                             .catch(err => {
                                 client.release();
-                                return { ingo_pago: {}, status: 400, message: 'No se pudo pagar el servicio' };
+                                return { ingo_pago: {}, status: 400, message: 'No se logro pagar el servicio' };
                             })
                     });
 
@@ -848,7 +850,7 @@ class Usuario_controller {
                 }
 
             } catch (e) {
-                return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'error interno del servidor' };
+                return { info_pago: {}, status: 500, message: 'Error interno del servidor' };
             }
 
         }
@@ -880,7 +882,7 @@ class Usuario_controller {
                         })
                         .catch(err => {
                             client.release();
-                            return { servicio_id: servicio_pedido_id, estado_servicio_id: '', status: 400, message: 'No se pudo actualizar el servicio' };
+                            return { servicio_id: servicio_pedido_id, estado_servicio_id: '', status: 400, message: 'No se logro actualizar el servicio' };
                         })
                 });
 
@@ -889,7 +891,7 @@ class Usuario_controller {
             return response;
 
         } catch (e) {
-            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'error interno del servidor' };
+            return { servicio_id: {}, status: 500, message: 'Error interno del servidor' };
         }
     }
 
@@ -918,7 +920,7 @@ class Usuario_controller {
                         })
                         .catch(err => {
                             client.release();
-                            return { servicio_id: servicio_pedido_id, estado_servicio_id: '', status: 400, message: 'No se pudo actualizar el servicio' };
+                            return { servicio_id: servicio_pedido_id, estado_servicio_id: '', status: 400, message: 'No se logro actualizar el servicio' };
                         })
                 });
 
@@ -927,7 +929,7 @@ class Usuario_controller {
             return response;
 
         } catch (e) {
-            return { pedido_id: { servicio_nro: '', usuario_id: '', estado_servicio_id: '' }, status: 500, message: 'error interno del servidor' };
+            return { servicio_id: {}, status: 500, message: 'Error interno del servidor' };
         }
     }
 

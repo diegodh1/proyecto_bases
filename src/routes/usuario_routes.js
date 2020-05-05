@@ -176,7 +176,7 @@ exports.puntuacion_dar = async(req, res) => {
 
     if (!Number(servicio_nro) || !Number(calificacion)) {
         res.json({
-            message: 'El id y la calificacion deben ser datos númericos',
+            message: 'El servicio y la calificacion deben ser datos númericos',
             status: 400
         });
     } else {
@@ -206,7 +206,7 @@ exports.pagar_servicio = async(req, res) => {
 
     if (!Number(servicio_pedido_id) || !Number(pago_valor)) {
         res.json({
-            message: 'El id y el pago deben ser datos númericos',
+            message: 'El id del servicio pedido y el pago deben ser datos númericos',
             status: 400
         });
     } else {
@@ -265,7 +265,7 @@ exports.modificar_estado_servicio = async(req, res) => {
 
     if (!Number(servicio_pedido_id)) {
         res.json({
-            message: 'El id debe ser tipo numérico',
+            message: 'El id del servicio pedido debe ser tipo numérico',
             status: 400
         });
     } else {

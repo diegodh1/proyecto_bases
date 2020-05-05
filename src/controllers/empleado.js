@@ -207,8 +207,8 @@ class Empleado_controller {
                             client.release();
 
                             return {
-                                status: 500,
-                                message: 'Error interno del servidor'
+                                status: 400,
+                                message: 'Error al restablecer la contraseña'
                             };
                         })
                 });
@@ -257,12 +257,12 @@ class Empleado_controller {
                             .query(sql, values)
                             .then(res => {
                                 client.release();
-                                return { servicio_pedido_id: res.rows[0], status: 200, message: '' };
+                                return { servicio_pedido_id: res.rows[0], status: 200, message: 'Servicio aceptado correctamente' };
 
                             })
                             .catch(err => {
                                 client.release();
-                                return { servicio_pedido_id: {}, status: 400, message: 'No se pudo aceptar el servicio' };
+                                return { servicio_pedido_id: {}, status: 400, message: 'No se logro aceptar el servicio' };
                             })
                     });
                 // resolvemos la promesa
@@ -383,7 +383,7 @@ class Empleado_controller {
                         })
                         .catch(err => {
                             client.release();
-                            return { info: res.rows[0], status: 400, message: "No se encontro la informacion para aceptar el trabajo" };
+                            return { info: {}, status: 400, message: "No se encontro al trabajador del servicio" };
                         })
                 });
 
@@ -424,7 +424,7 @@ class Empleado_controller {
                         })
                         .catch(err => {
                             client.release();
-                            return { info: {}, status: 400, message: "No se encontro la informacion para aceptar el trabajo" };
+                            return { info: {}, status: 400, message: "No se encontro la fecha del trabajo a aceptar" };
                         })
                 });
 
@@ -437,7 +437,7 @@ class Empleado_controller {
             return response;
         } catch (e) {
             return {
-                fecha: '',
+                info: {},
                 status: 500,
                 message: 'Error interno del servidor'
             };
@@ -541,7 +541,7 @@ class Empleado_controller {
             return response;
 
         } catch (e) {
-            return { servicio_pedido_id: {}, status: 500, message: 'error interno del servidor' };
+            return { servicio_id: {}, estado_servicio: '', status: 500, message: 'Error interno del servidor' };
         }
     }
 
@@ -677,7 +677,7 @@ class Empleado_controller {
             }
 
         } catch (e) {
-            return { trabajador: {}, status: 500, message: 'error interno del servidor' };
+            return { trabajador: {}, status: 500, message: 'Error interno del servidor' };
         }
     }
 
