@@ -9,14 +9,6 @@ exports.filtro_ocupacion = async(req, res) => {
     ocupacion_controller = new Ocupacion_controller();
     let data = ocupacion_controller.ocupacion_filtro(id);
 
-    if (!Number(id)) {
-        res.json({
-            message: 'El id de la ocupacion debe ser un dato numerico',
-            status: 400
-        });
-
-    } else {
-
         //resolvemos la promesa
         data.then(result => {
             res.json(result);
@@ -26,7 +18,5 @@ exports.filtro_ocupacion = async(req, res) => {
                 status: 500
             });
         });
-
-    }
 
 }

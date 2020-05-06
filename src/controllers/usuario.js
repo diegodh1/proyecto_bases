@@ -496,7 +496,7 @@ class Usuario_controller {
                 parseInt(servicio_horas),
                 servicio_pedido_fecha,
                 es_por_hora,
-                parseInt(servicio_horas),
+                parseInt(servicio_unidad_labor),
                 servicio_pedido_fecha,
                 servicio_pedido_fecha, !es_por_hora,
                 servicio_pedido_fecha,
@@ -547,8 +547,8 @@ class Usuario_controller {
         let sql = "SELECT sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula,case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
         "to_char(sp.servicio_pedido_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sp.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor "+
         "FROM servicio_pedido as sp JOIN servicio as ser ON ser.servicio_nro = sp.servicio_nro "+
-        "WHERE usuario_id = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC  LIMIT $3";
-        let values = [parseInt(usuario_id), estado_servicio_id, parseInt(limite)]
+        "WHERE usuario_id = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC";
+        let values = [parseInt(usuario_id), estado_servicio_id]
         try {
             // realizamos la consulta
             let data = pool
@@ -577,8 +577,8 @@ class Usuario_controller {
         let sql = "select sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
         "to_char(sa.servicio_aceptado_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sa.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor from servicio_aceptado as sa join servicio_pedido as sp on sp.servicio_pedido_id = sa.servicio_pedido_id "+
         "join servicio as ser on ser.servicio_nro = sp.servicio_nro "+
-        "where sp.usuario_id = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc limit $3";
-        let values = [parseInt(usuario_id), estado_servicio_id, parseInt(limite)]
+        "where sp.usuario_id = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc";
+        let values = [parseInt(usuario_id), estado_servicio_id]
         try {
             // realizamos la consulta
             let data = pool
