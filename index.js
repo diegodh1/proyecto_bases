@@ -110,6 +110,8 @@ app.post('/empleados_cercanos', empleado_routes.empleados_cercanos);
 app.post('/aceptar_servicio', empleado_routes.aceptar_servicio);
 //metodo para actualizar un servicio
 app.post('/servicio_update', empleado_routes.servicio_update);
+//metodo para actualizar un servicio aceptado
+app.post('/update_servicio_aceptado', empleado_routes.update_servicio_aceptado);
 // este metodo me permite agregar servicios a un trabajador
 app.post('/agregar_servicios_empleado', empleado_routes.agregar_servicios_empleado);
 // este metodo me permite obtener toda la informacion de un empleado
@@ -126,6 +128,10 @@ app.post('/pedir_servicio', usuario_routes.pedir_servicio);
 app.post('/get_ultimos_servicios_pedidos', usuario_routes.get_ultimos_servicios_pedidos);
 // este metodo nos permite ver los ultimos aceptados por el usuario
 app.post('/get_ultimos_servicios_aceptados', usuario_routes.get_ultimos_servicios_aceptados);
+// este metodo nos permite ver los ultimos pedidos para el empleado
+app.post('/get_servicios_pedidos_trabajdor', empleado_routes.get_ultimos_servicios_pedidos);
+// este metodo nos permite ver los ultimos aceptados por el empleado
+app.post('/get_servicios_aceptados_trabajador', empleado_routes.get_ultimos_servicios_aceptados);
 // este metodo nos permite crear el pago de un servicio
 app.post('/pagar_servicio', usuario_routes.pagar_servicio);
 // este metodo nos permite cambiar directamente el estado_servicio_id directamente a un servicio pedido

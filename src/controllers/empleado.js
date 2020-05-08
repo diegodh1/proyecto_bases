@@ -544,6 +544,41 @@ class Empleado_controller {
             return { servicio_id: {}, estado_servicio: '', status: 500, message: 'Error interno del servidor' };
         }
     }
+    //METODO QUE ACTUALIZAR EL ESTADO_SERVICIO_ID 
+    async update_servicio_aceptado(servicio_pedido_id, estado_servicio_id) {
+        try {
+
+            //realizamos la consulta
+            const sql = 'UPDATE servicio_aceptado ' +
+                'SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2';
+            //obtenemos los valores para asignar
+            const values = [estado_servicio_id,
+                    parseInt(servicio_pedido_id)
+                ]
+                // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { servicio_id: servicio_pedido_id, estado_servicio: estado_servicio_id, status: 200, message: 'Servicio actualizado correctamente' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { servicio_id: servicio_pedido_id, estado_servicio: '', status: 400, message: 'No se pudo actualizar el servicio' };
+                        })
+                });
+            // resolvemos la promesa
+            let response = await data;
+            return response;
+
+        } catch (e) {
+            return { servicio_id: {}, estado_servicio: '', status: 500, message: 'Error interno del servidor' };
+        }
+    }
 
     //METODO QUE DA LOS EMPLEADOS MÁS CERCANOS AL USUARIO DE ACUERDO AL SERVICIO
     async empleados_cercanos(id_usuario, ocupacion_id, limite) {
@@ -678,6 +713,71 @@ class Empleado_controller {
 
         } catch (e) {
             return { trabajador: {}, status: 500, message: 'Error interno del servidor' };
+        }
+    }
+
+    //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS PENDIENTES DEL TRABAJADOR
+    async get_servicios_pedidos_trabajdor(usuario_id, estado_servicio_id, limite){
+        let sql = "SELECT ser.ocupacion_id, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, (usuario.usuario_nombre||' '||usuario.usuario_apellido) as usuario_nombre,usuario.usuario_celular, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
+        "to_char(sp.servicio_pedido_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sp.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor "+
+        "FROM servicio as ser JOIN servicio_pedido as sp ON  sp.servicio_nro = ser.servicio_nro "+
+        "JOIN usuario ON usuario.usuario_id = sp.usuario_id "+
+        "WHERE ser.trabajador_cedula = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC";
+        let values = [parseInt(usuario_id), estado_servicio_id]
+        try {
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return {servicios: res.rows, status:200, message:'Operación realizada con éxito'};
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return {servicios: [], status:400, message:'Los parametros enviados no son correctos'};
+                        })
+                });
+            let response = await data;
+            return response;
+        } catch (e) {
+            return {servicios: [], status:500, message:'Error interno del servidor'};
+        }
+    }
+
+    //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS ACEPTADOS POR EL TRABAJADOR
+    async get__servicios_aceptados_trabajdor(usuario_id, estado_servicio_id, limite){
+        let sql = "select ser.ocupacion_id, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, (usuario.usuario_nombre||' '||usuario.usuario_apellido) as usuario_nombre,usuario.usuario_celular, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
+        "to_char(sa.servicio_aceptado_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sa.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor "+
+        "from servicio as ser join servicio_pedido as sp on ser.servicio_nro = sp.servicio_nro "+
+        "join servicio_aceptado as sa ON sa.servicio_pedido_id = sp.servicio_pedido_id "+
+        "JOIN usuario ON usuario.usuario_id = sp.usuario_id "+
+        "where ser.trabajador_cedula = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc";
+        let values = [parseInt(usuario_id), estado_servicio_id]
+        try {
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return {servicios: res.rows, status:200};
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return {servicios: [], status:400};
+                        })
+                });
+            let response = await data;
+            return response;
+        } catch (e) {
+            return {servicios: [], status:500};
         }
     }
 
