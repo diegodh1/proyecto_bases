@@ -119,7 +119,7 @@ exports.get_ultimos_servicios_pedidos = async(req, res) => {
         res.json({
             message: 'El id del usuario y el límite deben ser numéricos',
             status: 400,
-            servicios:[]
+            servicios: []
         });
     } else {
         //resolvemos la promesa
@@ -129,7 +129,7 @@ exports.get_ultimos_servicios_pedidos = async(req, res) => {
             res.json({
                 message: err,
                 status: 500,
-                servicios:[]
+                servicios: []
             });
         });
     }
@@ -158,7 +158,7 @@ exports.get_ultimos_servicios_aceptados = async(req, res) => {
             res.json({
                 message: err,
                 status: 500,
-                message:'Error interno del servidor'
+                message: 'Error interno del servidor'
             });
         });
     }
@@ -199,14 +199,13 @@ exports.pagar_servicio = async(req, res) => {
     //obtenemos los campos de la solicitud
     servicio_pedido_id = req.body.servicio_pedido_id;
     pago_fecha = req.body.pago_fecha;
-    pago_valor = req.body.pago_valor;
 
     usuario_controller = new Usuario_controller();
-    let data = usuario_controller.servicio_pagar(servicio_pedido_id, pago_fecha, pago_valor);
+    let data = usuario_controller.servicio_pagar(servicio_pedido_id, pago_fecha);
 
-    if (!Number(servicio_pedido_id) || !Number(pago_valor)) {
+    if (!Number(servicio_pedido_id)) {
         res.json({
-            message: 'El id del servicio pedido y el pago deben ser datos númericos',
+            message: 'El id del servicio pedido debe ser dato númerico',
             status: 400
         });
     } else {
