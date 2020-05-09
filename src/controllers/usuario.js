@@ -543,41 +543,41 @@ class Usuario_controller {
     }
 
     //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS PEDIDOS POR EL USUARIO
-    async get_ultimos_servicios_pedidos(usuario_id, estado_servicio_id, limite){
-        let sql = "SELECT sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula,case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
-        "to_char(sp.servicio_pedido_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sp.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor "+
-        "FROM servicio_pedido as sp JOIN servicio as ser ON ser.servicio_nro = sp.servicio_nro "+
-        "WHERE usuario_id = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC";
-        let values = [parseInt(usuario_id), estado_servicio_id]
-        try {
-            // realizamos la consulta
-            let data = pool
-                .connect()
-                .then(client => {
-                    return client
-                        .query(sql, values)
-                        .then(res => {
-                            client.release();
-                            return {servicios: res.rows, status:200, message:'Operación realizada con éxito'};
+    async get_ultimos_servicios_pedidos(usuario_id, estado_servicio_id, limite) {
+            let sql = "SELECT sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula,case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, " +
+                "to_char(sp.servicio_pedido_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sp.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor " +
+                "FROM servicio_pedido as sp JOIN servicio as ser ON ser.servicio_nro = sp.servicio_nro " +
+                "WHERE usuario_id = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC";
+            let values = [parseInt(usuario_id), estado_servicio_id]
+            try {
+                // realizamos la consulta
+                let data = pool
+                    .connect()
+                    .then(client => {
+                        return client
+                            .query(sql, values)
+                            .then(res => {
+                                client.release();
+                                return { servicios: res.rows, status: 200, message: 'Operación realizada con éxito' };
 
-                        })
-                        .catch(err => {
-                            client.release();
-                            return {servicios: [], status:400, message:'Los parametros enviados no son correctos'};
-                        })
-                });
-            let response = await data;
-            return response;
-        } catch (e) {
-            return {servicios: [], status:500, message:'Error interno del servidor'};
+                            })
+                            .catch(err => {
+                                client.release();
+                                return { servicios: [], status: 400, message: 'Los parametros enviados no son correctos' };
+                            })
+                    });
+                let response = await data;
+                return response;
+            } catch (e) {
+                return { servicios: [], status: 500, message: 'Error interno del servidor' };
+            }
         }
-    }
-    //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS ACEPTADOS POR EL USUARIO
-    async get_ultimos_servicios_aceptados(usuario_id, estado_servicio_id, limite){
-        let sql = "select sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
-        "to_char(sa.servicio_aceptado_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sa.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor from servicio_aceptado as sa join servicio_pedido as sp on sp.servicio_pedido_id = sa.servicio_pedido_id "+
-        "join servicio as ser on ser.servicio_nro = sp.servicio_nro "+
-        "where sp.usuario_id = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc";
+        //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS ACEPTADOS POR EL USUARIO
+    async get_ultimos_servicios_aceptados(usuario_id, estado_servicio_id, limite) {
+        let sql = "select sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, " +
+            "to_char(sa.servicio_aceptado_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sa.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor from servicio_aceptado as sa join servicio_pedido as sp on sp.servicio_pedido_id = sa.servicio_pedido_id " +
+            "join servicio as ser on ser.servicio_nro = sp.servicio_nro " +
+            "where sp.usuario_id = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc";
         let values = [parseInt(usuario_id), estado_servicio_id]
         try {
             // realizamos la consulta
@@ -588,18 +588,18 @@ class Usuario_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return {servicios: res.rows, status:200};
+                            return { servicios: res.rows, status: 200 };
 
                         })
                         .catch(err => {
                             client.release();
-                            return {servicios: [], status:400};
+                            return { servicios: [], status: 400 };
                         })
                 });
             let response = await data;
             return response;
         } catch (e) {
-            return {servicios: [], status:500};
+            return { servicios: [], status: 500 };
         }
     }
 
@@ -802,18 +802,68 @@ class Usuario_controller {
         }
     }
 
+    //METODO QUE PERMITE aceptar el pago de un servicio
+    async servicio_calcular_cobro(servicio_pedido_id) {
+
+        try {
+
+            //realizamos la consulta
+            const sql = "SELECT servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora, servicio_precio_hora, servicio_precio_unidad_labor FROM servicio NATURAL JOIN " +
+                "(SELECT servicio_nro, servicio_pedido_horas, servicio_pedido_unidad_labor, servicio_pedido_es_por_hora FROM servicio_pedido WHERE servicio_pedido_id = $1) AS servicio_info";
+            //obtenemos los valores para asignar
+            const values = [
+                parseInt(servicio_pedido_id),
+            ]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { cobro: res.rows[0], status: 200, message: 'Cobro encontrado con exito' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { cobro: {}, status: 400, message: 'No se logro encontrar el cobro' };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response.status !== 200) {
+                return response;
+            } else {
+                let valor_cobro = 0;
+                if (response.cobro.servicio_pedido_es_por_hora) {
+                    valor_cobro = response.cobro.servicio_pedido_horas * response.cobro.servicio_precio_hora;
+                } else {
+                    valor_cobro = response.cobro.servicio_pedido_unidad_labor * response.cobro.servicio_precio_unidad_labor;
+                }
+                return { cobro: valor_cobro, status: 200, message: 'Cobro calculado con exito' };
+            }
+
+        } catch (e) {
+            return { cobro: {}, status: 500, message: 'Error interno del servidor' };
+        }
+
+    }
 
     //METODO QUE PERMITE PAGAR un servicio en la base
-    async servicio_pagar(servicio_pedido_id, pago_fecha, pago_valor) {
+    async servicio_pagar(servicio_pedido_id, pago_fecha) {
 
         let pagado = await this.servicio_update(servicio_pedido_id, 'FINALIZADO')
         let pagado_aceptado = await this.servicio_aceptado_update(servicio_pedido_id, 'FINALIZADO');
-        if (pagado.status !== 200 || pagado_aceptado.status !== 200) {
+        let pago = await this.servicio_calcular_cobro(servicio_pedido_id);
+        if (pagado.status !== 200 || pagado_aceptado.status !== 200 || pago.status !== 200) {
             return pagado.message;
         } else {
 
             try {
-
+                let pago_valor = pago.cobro;
                 //realizamos la consulta
                 const sql = "INSERT INTO pago(servicio_pedido_id, pago_fecha, pago_valor) " +
                     "VALUES($1, $2, $3) RETURNING servicio_pedido_id, pago_fecha, pago_valor";
