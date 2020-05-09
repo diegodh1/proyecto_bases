@@ -544,7 +544,7 @@ class Usuario_controller {
 
     //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS PEDIDOS POR EL USUARIO
     async get_ultimos_servicios_pedidos(usuario_id, estado_servicio_id, limite){
-        let sql = "SELECT sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula,case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
+        let sql = "SELECT ser.servicio_nro, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula,case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
         "to_char(sp.servicio_pedido_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sp.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor "+
         "FROM servicio_pedido as sp JOIN servicio as ser ON ser.servicio_nro = sp.servicio_nro "+
         "WHERE usuario_id = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC";
@@ -574,7 +574,7 @@ class Usuario_controller {
     }
     //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS ACEPTADOS POR EL USUARIO
     async get_ultimos_servicios_aceptados(usuario_id, estado_servicio_id, limite){
-        let sql = "select sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
+        let sql = "select ser.servicio_nro, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
         "to_char(sa.servicio_aceptado_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sa.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor from servicio_aceptado as sa join servicio_pedido as sp on sp.servicio_pedido_id = sa.servicio_pedido_id "+
         "join servicio as ser on ser.servicio_nro = sp.servicio_nro "+
         "where sp.usuario_id = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc";
