@@ -116,6 +116,8 @@ app.post('/update_servicio_aceptado', empleado_routes.update_servicio_aceptado);
 app.post('/agregar_servicios_empleado', empleado_routes.agregar_servicios_empleado);
 // este metodo me permite obtener toda la informacion de un empleado
 app.post('/empleado_informacion', empleado_routes.empleado_informacion);
+// este metodo me permite inactivar un servicio del empleado
+app.post('/inactivar_servicio', empleado_routes.inactivar_servicio);
 // este metodo me permite obtener el reporte de un empleado
 app.post('/empleado_reporte', empleado_routes.empleado_reporte);
 // metodo para loguear el usuario a la apliacion
@@ -134,6 +136,14 @@ app.post('/get_servicios_pedidos_trabajdor', empleado_routes.get_ultimos_servici
 app.post('/get_servicios_aceptados_trabajador', empleado_routes.get_ultimos_servicios_aceptados);
 // este metodo nos permite crear el pago de un servicio
 app.post('/pagar_servicio', usuario_routes.pagar_servicio);
+// este metodo nos permite consultar el saldo de un usuario
+app.post('/dar_saldo_usuario', usuario_routes.dar_saldo_usuario);
+// este metodo nos permite consultar el reporte de profesion
+app.post('/get_reporte_profesion', usuario_routes.get_reporte_profesion);
+// este metodo nos permite consultar el reporte de los trabajos mas solicitados para el trabajador
+app.post('/get_reporte_profesion_empleado', empleado_routes.get_reporte_profesion);
+// este metodo nos permite obtener los servicios que obtiene un trabajador
+app.post('/get_servicios_trabajador', empleado_routes.get_servicios_trabajador);
 // este metodo nos permite cambiar directamente el estado_servicio_id directamente a un servicio pedido
 app.post('/modificar_estado_servicio', usuario_routes.modificar_estado_servicio);
 // este metodo nos permite recargar la cuenta de un usuario

@@ -18,18 +18,18 @@ class Empleado_controller {
                 "VALUES($1, $2, $3, $4, $5, $6, $7, $8, ST_GeomFromText($9, 4326), $10, $11, $12, $13) RETURNING trabajador_cedula, trabajador_nombre, trabajador_apellido";
             //obtenemos los valores para asignar
             const values = [empleado.get_trabajador_cedula(),
-                empleado.get_trabajador_nombre(),
-                empleado.get_trabajador_apellido(),
-                empleado.get_trabajador_celular(),
-                empleado.get_trabajador_correo(),
-                empleado.get_trabajador_latitud(),
-                empleado.get_trabajador_longitud(),
-                empleado.get_trabajador_direccion(),
-                'POINT(' + empleado.get_trabajador_latitud() + ' ' + empleado.get_trabajador_longitud() + ')',
-                empleado.foto_to_path(),
-                empleado.doc_to_path(),
-                empleado.get_trabajador_estado(),
-                empleado.contrasenha_ecrypt()
+            empleado.get_trabajador_nombre(),
+            empleado.get_trabajador_apellido(),
+            empleado.get_trabajador_celular(),
+            empleado.get_trabajador_correo(),
+            empleado.get_trabajador_latitud(),
+            empleado.get_trabajador_longitud(),
+            empleado.get_trabajador_direccion(),
+            'POINT(' + empleado.get_trabajador_latitud() + ' ' + empleado.get_trabajador_longitud() + ')',
+            empleado.foto_to_path(),
+            empleado.doc_to_path(),
+            empleado.get_trabajador_estado(),
+            empleado.contrasenha_ecrypt()
             ]
 
             // realizamos la consulta
@@ -246,10 +246,10 @@ class Empleado_controller {
                     "VALUES($1, $2, $3) RETURNING servicio_pedido_id, servicio_aceptado_fecha, estado_servicio_id";
                 //obtenemos los valores para asignar
                 const values = [parseInt(servicio_pedido_id),
-                        servicio_aceptado_fecha,
-                        estado_actualizado
-                    ]
-                    // realizamos la consulta
+                    servicio_aceptado_fecha,
+                    estado_actualizado
+                ]
+                // realizamos la consulta
                 let data = pool
                     .connect()
                     .then(client => {
@@ -518,9 +518,9 @@ class Empleado_controller {
                 'SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2';
             //obtenemos los valores para asignar
             const values = [estado_servicio_id,
-                    parseInt(servicio_pedido_id)
-                ]
-                // realizamos la consulta
+                parseInt(servicio_pedido_id)
+            ]
+            // realizamos la consulta
             let data = pool
                 .connect()
                 .then(client => {
@@ -553,9 +553,9 @@ class Empleado_controller {
                 'SET estado_servicio_id = $1 WHERE servicio_pedido_id = $2';
             //obtenemos los valores para asignar
             const values = [estado_servicio_id,
-                    parseInt(servicio_pedido_id)
-                ]
-                // realizamos la consulta
+                parseInt(servicio_pedido_id)
+            ]
+            // realizamos la consulta
             let data = pool
                 .connect()
                 .then(client => {
@@ -684,7 +684,7 @@ class Empleado_controller {
 
             //obtenemos los valores para asignar
             const values = [parseInt(servicio_nro)]
-                // realizamos la consulta
+            // realizamos la consulta
             let data = pool
                 .connect()
                 .then(client => {
@@ -717,12 +717,12 @@ class Empleado_controller {
     }
 
     //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS PENDIENTES DEL TRABAJADOR
-    async get_servicios_pedidos_trabajdor(usuario_id, estado_servicio_id, limite){
-        let sql = "SELECT ser.ocupacion_id, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, (usuario.usuario_nombre||' '||usuario.usuario_apellido) as usuario_nombre,usuario.usuario_celular, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
-        "to_char(sp.servicio_pedido_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sp.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor "+
-        "FROM servicio as ser JOIN servicio_pedido as sp ON  sp.servicio_nro = ser.servicio_nro "+
-        "JOIN usuario ON usuario.usuario_id = sp.usuario_id "+
-        "WHERE ser.trabajador_cedula = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC";
+    async get_servicios_pedidos_trabajdor(usuario_id, estado_servicio_id, limite) {
+        let sql = "SELECT ser.ocupacion_id, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, (usuario.usuario_nombre||' '||usuario.usuario_apellido) as usuario_nombre,usuario.usuario_celular, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, " +
+            "to_char(sp.servicio_pedido_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sp.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor " +
+            "FROM servicio as ser JOIN servicio_pedido as sp ON  sp.servicio_nro = ser.servicio_nro " +
+            "JOIN usuario ON usuario.usuario_id = sp.usuario_id " +
+            "WHERE ser.trabajador_cedula = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC";
         let values = [parseInt(usuario_id), estado_servicio_id]
         try {
             // realizamos la consulta
@@ -733,29 +733,29 @@ class Empleado_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return {servicios: res.rows, status:200, message:'Operación realizada con éxito'};
+                            return { servicios: res.rows, status: 200, message: 'Operación realizada con éxito' };
 
                         })
                         .catch(err => {
                             client.release();
-                            return {servicios: [], status:400, message:'Los parametros enviados no son correctos'};
+                            return { servicios: [], status: 400, message: 'Los parametros enviados no son correctos' };
                         })
                 });
             let response = await data;
             return response;
         } catch (e) {
-            return {servicios: [], status:500, message:'Error interno del servidor'};
+            return { servicios: [], status: 500, message: 'Error interno del servidor' };
         }
     }
 
     //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS ACEPTADOS POR EL TRABAJADOR
-    async get__servicios_aceptados_trabajdor(usuario_id, estado_servicio_id, limite){
-        let sql = "select ser.ocupacion_id, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, (usuario.usuario_nombre||' '||usuario.usuario_apellido) as usuario_nombre,usuario.usuario_celular, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
-        "to_char(sa.servicio_aceptado_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sa.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor "+
-        "from servicio as ser join servicio_pedido as sp on ser.servicio_nro = sp.servicio_nro "+
-        "join servicio_aceptado as sa ON sa.servicio_pedido_id = sp.servicio_pedido_id "+
-        "JOIN usuario ON usuario.usuario_id = sp.usuario_id "+
-        "where ser.trabajador_cedula = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc";
+    async get__servicios_aceptados_trabajdor(usuario_id, estado_servicio_id, limite) {
+        let sql = "select ser.ocupacion_id, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, (usuario.usuario_nombre||' '||usuario.usuario_apellido) as usuario_nombre,usuario.usuario_celular, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, " +
+            "to_char(sa.servicio_aceptado_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sa.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor " +
+            "from servicio as ser join servicio_pedido as sp on ser.servicio_nro = sp.servicio_nro " +
+            "join servicio_aceptado as sa ON sa.servicio_pedido_id = sp.servicio_pedido_id " +
+            "JOIN usuario ON usuario.usuario_id = sp.usuario_id " +
+            "where ser.trabajador_cedula = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc";
         let values = [parseInt(usuario_id), estado_servicio_id]
         try {
             // realizamos la consulta
@@ -766,19 +766,179 @@ class Empleado_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return {servicios: res.rows, status:200};
+                            return { servicios: res.rows, status: 200 };
 
                         })
                         .catch(err => {
                             client.release();
-                            return {servicios: [], status:400};
+                            return { servicios: [], status: 400 };
                         })
                 });
             let response = await data;
             return response;
         } catch (e) {
-            return {servicios: [], status:500};
+            return { servicios: [], status: 500 };
         }
+    }
+    //METODO QUE PERMITE DAR LOS SERVICIOS QUE OFRECE UN TRABAJADOR
+    async get_servicios_trabajador(usuario_id) {
+        let sql = "select ser.servicio_nro, ser.ocupacion_id, ser.servicio_precio_hora, ser.servicio_precio_unidad_labor, ser.servicio_descripcion " +
+            "from servicio as ser  where ser.trabajador_cedula = $1 AND servicio_estado = true";
+        let values = [parseInt(usuario_id)]
+        try {
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { servicios: res.rows, status: 200 };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { servicios: [], status: 400 };
+                        })
+                });
+            let response = await data;
+            return response;
+        } catch (e) {
+            return { servicios: [], status: 500 };
+        }
+    }
+    //METODO QUE PERMITE INACTIVAR UN SERVICIO
+    async inactivar_servicio(servicio_nro) {
+        let sql = "UPDATE servicio SET servicio_estado = false " +
+            "WHERE servicio_nro = $1 RETURNING servicio_nro";
+        let values = [parseInt(servicio_nro)]
+        try {
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { servicio: res.rows[0], status: 200, message:'Servicio eliminado'};
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { servicio: {}, status: 400,message:'No se pudo eliminar el servicio'};
+                        })
+                });
+            let response = await data;
+            return response;
+        } catch (e) {
+            return { servicios: {}, status: 500, message:'error interno del servidor'};
+        }
+    }
+    //METODO QUE PERMITE DAR EL REPORTE DE LOS SERVICIOS MAS SOLICITADOS AL TRABAJADOR
+    async get_reporte_profesion(trabajador_cedula) {
+        const colors = [
+            '#FF0000',
+            '#FFFF00',
+            '#800000',
+            '#808000',
+            '#00FF00',
+            '#008000',
+            '#00FFFF',
+            '#008080',
+            '#0000FF',
+            '#000080',
+            '#FF00FF',
+            '#800080',
+            '#FFFFFF',
+            '#C0C0C0'
+        ];
+        let labels = [];
+        let data_char = [];
+        let backgroundColor = [];
+        let hoverBackgroundColor = [];
+        try {
+
+            //realizamos la consulta
+            const sql = "SELECT ocupacion_id,count(servicio_pedido.servicio_pedido_id) as count FROM servicio_pedido JOIN servicio ON  servicio.servicio_nro = servicio_pedido.servicio_nro " +
+                "WHERE servicio.trabajador_cedula = $1 " +
+                "GROUP BY ocupacion_id";
+            //obtenemos los valores para asignar
+            const values = [
+                parseInt(trabajador_cedula)
+            ]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return res.rows;
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return [];
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            let j = 0;
+            for (let i = 0; i < response.length; i++) {
+                labels.push(response[i].ocupacion_id);
+                data_char.push(response[i].count);
+                if (j === colors.length) {
+                    j = 0;
+                }
+                backgroundColor.push(colors[j]);
+                hoverBackgroundColor.push(colors[j]);
+                j = j + 1;
+            }
+            return { message: 'operación realizada', status: 200, char: { labels, datasets: [{ data: data_char, backgroundColor, hoverBackgroundColor }] } };
+
+        } catch (e) {
+            return { message: 'Error interno del servidor', status: 500, char: { labels, datasets: [{ data: data_char, backgroundColor, hoverBackgroundColor }] } };
+        }
+    }
+    async verificar_servicios(trabajador_cedula, servicios) {
+        //realizamos la consulta
+        const sql = 'SELECT * FROM servicio WHERE trabajador_cedula = $1 AND ocupacion_id = $2 AND servicio_estado = true';
+        let list_servicios = [];
+        //convertimos el strin a JSON
+        let array_servicios = JSON.parse(servicios);
+        //recorremos el array_servicios para agregar el servicio uno por uno
+        for (let i = 0; i < array_servicios.length; i++) {
+            const values = [trabajador_cedula, array_servicios[i].ocupacion_id];
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            console.log(res.rows[2]);
+                            return res.rows;
+
+                        })
+                        .catch(err => {
+                            return [];
+                        })
+                });
+            //obetenmos la respuesta
+            let response = await data;
+
+            //agregamos los servicios que no estan en la base
+            if (response.length == 0) {
+                list_servicios.push(array_servicios[i]);
+            }
+
+        }
+        return this.agregar_servicios(cedula, JSON.stringify([...new Set(list_servicios)]));
     }
 
 }

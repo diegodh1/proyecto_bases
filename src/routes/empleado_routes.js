@@ -64,6 +64,32 @@ exports.agregar_servicios_empleado = async(req, res) => {
     });
 }
 
+// metodo que permite inactivar un servicio
+exports.inactivar_servicio = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    servicio_nro = req.body.servicio_nro;
+
+    empleado_controller = new Empleado_controller();
+    let data = empleado_controller.inactivar_servicio(servicio_nro);
+
+    if (!Number(cedula)) {
+        res.json({
+            message: 'el número de servicio es númerico',
+            status: 400
+        });
+    }
+
+    //resolvemos la promesa
+    data.then(result => {
+        res.json(result);
+    }).catch(err => {
+        res.json({
+            message: err,
+            status: 500
+        });
+    });
+}
+
 // metodo para poder loguearnos como empleados a la base de datos
 exports.login_empleado = async(req, res) => {
         //obtenemos los campos de la solicitud
@@ -244,6 +270,28 @@ exports.update_servicio_aceptado = (req, res) => {
     }
 
 }
+// metodo que permite obtener los datos para graficar
+exports.get_reporte_profesion = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    trabajador_cedula = req.body.trabajador_cedula;
+
+    empleado_controller = new Empleado_controller();
+    let data = empleado_controller.get_reporte_profesion(trabajador_cedula);
+
+    if (!Number(trabajador_cedula)) {
+        res.json({status:400, char:{labels:[], datasets:[{data: [],backgroundColor:[],hoverBackgroundColor:[]}]}, message:'El id del trabajador debe ser numerico'});
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+};
 
 // metodo que permite obtener la informacion de un empleado
 exports.empleado_informacion = async(req, res) => {
@@ -266,6 +314,33 @@ exports.empleado_informacion = async(req, res) => {
         }).catch(err => {
             res.json({
                 message: err,
+                status: 500
+            });
+        });
+    }
+}
+
+// metodo que permite obtener los servicios que ofrece un trabajador
+exports.get_servicios_trabajador = async(req, res) => {
+
+    //obtenemos los campos de la solicitud
+    usuario_id = req.body.usuario_id;
+
+    empleado_controller = new Empleado_controller();
+    const data = empleado_controller.get_servicios_trabajador(usuario_id);
+
+    if (!Number(usuario_id)) {
+        res.json({
+            message: 'El id del empleado debe ser númerico',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                servicios: [],
                 status: 500
             });
         });

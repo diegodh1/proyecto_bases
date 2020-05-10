@@ -219,8 +219,54 @@ exports.pagar_servicio = async(req, res) => {
             });
         });
     }
+};
 
+// metodo que permite consultar el saldo de un usuario
+exports.dar_saldo_usuario = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    usuario_id = req.body.usuario_id;
 
+    usuario_controller = new Usuario_controller();
+    let data = usuario_controller.dar_saldo_usuario(usuario_id);
+
+    if (!Number(usuario_id)) {
+        res.json({
+            message: 'El id del usuario debe ser dato númerico',
+            status: 400
+        });
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
+};
+// metodo que permite obtener los datos para graficar
+exports.get_reporte_profesion = async(req, res) => {
+    //obtenemos los campos de la solicitud
+    usuario_id = req.body.usuario_id;
+
+    usuario_controller = new Usuario_controller();
+    let data = usuario_controller.get_reporte_profesion(usuario_id);
+
+    if (!Number(usuario_id)) {
+        res.json({status:400, char:{labels:[], datasets:[{data: [],backgroundColor:[],hoverBackgroundColor:[]}]}, message:'El id del usuario debe ser numerico'});
+    } else {
+        //resolvemos la promesa
+        data.then(result => {
+            res.json(result);
+        }).catch(err => {
+            res.json({
+                message: err,
+                status: 500
+            });
+        });
+    }
 };
 
 // metodo para poder loguearnos como usuarios a la base de datos

@@ -4,7 +4,7 @@ const { pool } = require('../connection');
 
 //CREAMOS LA CLASE CONTROLADORA DE Usuario LA CUAL ES LA QUE VA A COMUNICARSE DIRECTAMENTE CON LA BASE DE DATOS
 class Usuario_controller {
-    constructor() {}
+    constructor() { }
 
     //METODO QUE PERMITE CREAR UN Usuario NUEVO EN LA BASE DE DATOS
     async crear_usuario(id, nombre, apellido, celular, correo, latitud, longitud, direccion, foto_base64, recibo_base64, contrasenha, estado_usuario) {
@@ -543,11 +543,11 @@ class Usuario_controller {
     }
 
     //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS PEDIDOS POR EL USUARIO
-    async get_ultimos_servicios_pedidos(usuario_id, estado_servicio_id, limite){
-        let sql = "SELECT ser.servicio_nro, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula,case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
-        "to_char(sp.servicio_pedido_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sp.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor "+
-        "FROM servicio_pedido as sp JOIN servicio as ser ON ser.servicio_nro = sp.servicio_nro "+
-        "WHERE usuario_id = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC";
+    async get_ultimos_servicios_pedidos(usuario_id, estado_servicio_id, limite) {
+        let sql = "SELECT ser.servicio_nro, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula,case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, " +
+            "to_char(sp.servicio_pedido_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sp.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor " +
+            "FROM servicio_pedido as sp JOIN servicio as ser ON ser.servicio_nro = sp.servicio_nro " +
+            "WHERE usuario_id = $1 AND estado_servicio_id = $2 ORDER BY servicio_pedido_fecha DESC";
         let values = [parseInt(usuario_id), estado_servicio_id]
         try {
             // realizamos la consulta
@@ -558,26 +558,26 @@ class Usuario_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return {servicios: res.rows, status:200, message:'Operación realizada con éxito'};
+                            return { servicios: res.rows, status: 200, message: 'Operación realizada con éxito' };
 
-                            })
-                            .catch(err => {
-                                client.release();
-                                return { servicios: [], status: 400, message: 'Los parametros enviados no son correctos' };
-                            })
-                    });
-                let response = await data;
-                return response;
-            } catch (e) {
-                return { servicios: [], status: 500, message: 'Error interno del servidor' };
-            }
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { servicios: [], status: 400, message: 'Los parametros enviados no son correctos' };
+                        })
+                });
+            let response = await data;
+            return response;
+        } catch (e) {
+            return { servicios: [], status: 500, message: 'Error interno del servidor' };
+        }
     }
     //METODO QUE PERMITE DAR EL LISTADO DE LOS ULTIMOS SERVICIOS ACEPTADOS POR EL USUARIO
-    async get_ultimos_servicios_aceptados(usuario_id, estado_servicio_id, limite){
-        let sql = "select ser.servicio_nro, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, "+
-        "to_char(sa.servicio_aceptado_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sa.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor from servicio_aceptado as sa join servicio_pedido as sp on sp.servicio_pedido_id = sa.servicio_pedido_id "+
-        "join servicio as ser on ser.servicio_nro = sp.servicio_nro "+
-        "where sp.usuario_id = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc";
+    async get_ultimos_servicios_aceptados(usuario_id, estado_servicio_id, limite) {
+        let sql = "select ser.servicio_nro, sp.servicio_pedido_id, ser.servicio_precio_unidad_labor, ser.servicio_precio_hora, ser.trabajador_cedula, case sp.servicio_pedido_es_por_hora when true then sp.servicio_pedido_horas * ser.servicio_precio_hora else sp.servicio_pedido_unidad_labor * ser.servicio_precio_unidad_labor end as valor_servicio, " +
+            "to_char(sa.servicio_aceptado_fecha, 'YYYY-MM-DD HH:MM:SS') as fecha, sa.estado_servicio_id, sp.servicio_pedido_es_por_hora, sp.servicio_pedido_horas, sp.servicio_pedido_unidad_labor from servicio_aceptado as sa join servicio_pedido as sp on sp.servicio_pedido_id = sa.servicio_pedido_id " +
+            "join servicio as ser on ser.servicio_nro = sp.servicio_nro " +
+            "where sp.usuario_id = $1 and sa.estado_servicio_id = $2 order by sa.servicio_aceptado_fecha desc";
         let values = [parseInt(usuario_id), estado_servicio_id]
         try {
             // realizamos la consulta
@@ -802,6 +802,47 @@ class Usuario_controller {
         }
     }
 
+    //METODO QUE retorna el saldo actual de un usuario
+    async dar_saldo_usuario(usuario_id) {
+        try {
+            //realizamos la consulta
+            const sql = 'SELECT * FROM cuenta WHERE usuario_id = $1';
+            //obtenemos los valores para asignar
+            const values = [parseInt(usuario_id)]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { usuario: res.rows[0], status: 200, message: "Usuario encontrado" };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { usuario: { cuenta_saldo: 0, usuario_id }, status: 400, message: "Usuario no encontrado" };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            if (response !== 200) {
+                return response;
+            }
+
+            return response;
+        } catch (e) {
+            return {
+                usuario: { cuenta_saldo: 0, usuario_id },
+                status: 500,
+                message: 'Error interno del servidor'
+            };
+        }
+    }
+
     //METODO QUE PERMITE aceptar el pago de un servicio
     async servicio_calcular_cobro(servicio_pedido_id) {
 
@@ -984,14 +1025,36 @@ class Usuario_controller {
     }
 
     //METODO QUE PERMITE Actualizar un servicio_pedido
-    async obtener_saldo(id) {
+    async get_reporte_profesion(usuario_id) {
+        const colors = [
+            '#FF0000',
+            '#FFFF00',
+            '#800000',
+            '#808000',
+            '#00FF00',
+            '#008000',
+            '#00FFFF',
+            '#008080',
+            '#0000FF',
+            '#000080',
+            '#FF00FF',
+            '#800080',
+            '#FFFFFF',
+            '#C0C0C0'
+        ];
+        let labels = [];
+        let data_char = [];
+        let backgroundColor = [];
+        let hoverBackgroundColor = [];
         try {
 
             //realizamos la consulta
-            const sql = "SELECT cuenta_saldo FROM cuenta WHERE usuario_id = $1";
+            const sql = "SELECT ocupacion_id,count(servicio_pedido.servicio_pedido_id) as count FROM servicio_pedido JOIN servicio ON  servicio.servicio_nro = servicio_pedido.servicio_nro " +
+                "WHERE usuario_id = $1 "+
+                "GROUP BY ocupacion_id";
             //obtenemos los valores para asignar
             const values = [
-                id
+                parseInt(usuario_id)
             ]
 
             // realizamos la consulta
@@ -1002,21 +1065,32 @@ class Usuario_controller {
                         .query(sql, values)
                         .then(res => {
                             client.release();
-                            return { saldo_cuenta: res.rows[0], status: 200, message: 'Saldo encontrado' };
+                            return res.rows;
 
                         })
                         .catch(err => {
                             client.release();
-                            return { saldo_cuenta: {}, status: 400, message: 'Saldo no encontrado' };
+                            return [];
                         })
                 });
 
             // resolvemos la promesa
             let response = await data;
-            return response;
+            let j = 0;
+            for (let i = 0; i < response.length; i++) {
+                labels.push(response[i].ocupacion_id);
+                data_char.push(response[i].count);
+                if (j === colors.length) {
+                    j = 0;
+                }
+                backgroundColor.push(colors[j]);
+                hoverBackgroundColor.push(colors[j]);
+                j = j+1;
+            }
+            return {message:'operación realizada',status:200, char:{labels, datasets:[{data: data_char,backgroundColor,hoverBackgroundColor}]}};
 
         } catch (e) {
-            return { saldo_cuenta: {}, status: 500, message: 'Error interno del servidor' };
+            return {message:'Error interno del servidor',status:500, char:{labels, datasets:[{data: data_char,backgroundColor,hoverBackgroundColor}]}};
         }
     }
 
