@@ -253,7 +253,42 @@ class Usuario_controller {
             };
         }
     }
+    //METODO QUE PERMITE Actualizar un servicio_pedido
+    async obtener_saldo(id) {
+        try {
 
+            //realizamos la consulta
+            const sql = "SELECT cuenta_saldo FROM cuenta WHERE usuario_id = $1";
+            //obtenemos los valores para asignar
+            const values = [
+                id
+            ]
+
+            // realizamos la consulta
+            let data = pool
+                .connect()
+                .then(client => {
+                    return client
+                        .query(sql, values)
+                        .then(res => {
+                            client.release();
+                            return { saldo_cuenta: res.rows[0], status: 200, message: 'Saldo encontrado' };
+
+                        })
+                        .catch(err => {
+                            client.release();
+                            return { saldo_cuenta: {}, status: 400, message: 'Saldo no encontrado' };
+                        })
+                });
+
+            // resolvemos la promesa
+            let response = await data;
+            return response;
+
+        } catch (e) {
+            return { saldo_cuenta: {}, status: 500, message: 'Error interno del servidor' };
+        }
+    }
     // este metodo nos permite loguear al usuario
     async usuario_login(id, contrasenha) {
         try {
@@ -1050,7 +1085,7 @@ class Usuario_controller {
 
             //realizamos la consulta
             const sql = "SELECT ocupacion_id,count(servicio_pedido.servicio_pedido_id) as count FROM servicio_pedido JOIN servicio ON  servicio.servicio_nro = servicio_pedido.servicio_nro " +
-                "WHERE usuario_id = $1 "+
+                "WHERE usuario_id = $1 " +
                 "GROUP BY ocupacion_id";
             //obtenemos los valores para asignar
             const values = [
@@ -1085,12 +1120,12 @@ class Usuario_controller {
                 }
                 backgroundColor.push(colors[j]);
                 hoverBackgroundColor.push(colors[j]);
-                j = j+1;
+                j = j + 1;
             }
-            return {message:'operación realizada',status:200, char:{labels, datasets:[{data: data_char,backgroundColor,hoverBackgroundColor}]}};
+            return { message: 'operación realizada', status: 200, char: { labels, datasets: [{ data: data_char, backgroundColor, hoverBackgroundColor }] } };
 
         } catch (e) {
-            return {message:'Error interno del servidor',status:500, char:{labels, datasets:[{data: data_char,backgroundColor,hoverBackgroundColor}]}};
+            return { message: 'Error interno del servidor', status: 500, char: { labels, datasets: [{ data: data_char, backgroundColor, hoverBackgroundColor }] } };
         }
     }
 
